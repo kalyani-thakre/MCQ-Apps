@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codeline.AI</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+  <h1>Codeline.AI</h1>
+
+  <div id="page1">
+    <div class="user-details">
+      <input type="text" id="name" placeholder="Enter Name">
+      <input type="email" id="email" placeholder="Enter Email">
+      <input type="text" id="mobile" placeholder="Enter Mobile Number">
+    </div>
+
+    <button class="start-btn" id="sendOtpBtn" onclick="sendOTP()">
+      Send OTP to Email
+    </button>
+
+    <div id="otpContainer" style="display:none;">
+      <input type="text" id="otpInput" placeholder="OTP" maxlength="4">
+      
+      <button class="start-btn" id="verifyOtpBtn" onclick="verifyOTP()">
+        Verify OTP & Start Exam
+      </button>
+    </div>
+  </div>
+
+  <div id="page2" style="display:none;">
+    <div id="timer">02:00</div>
+
+    <div class="exam-layout">
+      <div class="left-panel">
+        <div class="top-bar">
+          <div id="qcount">Question 1 / 80</div>
+        </div>
+
+        <div id="quiz"></div>
+
+        <div class="btn-row">
+          <button class="next-btn" onclick="nextQuestion()">Save & Next</button>
+          <button class="skip-btn" onclick="skipQuestion()">Skip</button>
+          <button class="review-btn" onclick="previousQuestion()">Previous</button>
+        </div>
+
+        <div style="margin-top:15px;">
+          <button class="submit-btn" id="submitBtn" onclick="submitQuiz()" style="width:100%; padding:16px; border-radius:10px; font-size:20px;">
+            Submit
+          </button>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <h3>Questions</h3>
+        <div id="questionNumbers" class="question-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="page3" style="display:none;">
+    <div id="result"></div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
