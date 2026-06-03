@@ -1,12 +1,11 @@
-// ⚠️ IMPORTANT: Yahan apna Google Script Web App URL hi rehne dena
-const API_URL = "https://script.google.com/macros/s/AKfycbwRLlPsaavYxnvD8U7jzDGV_fheVF5PVVHNW1u26kQlL3PWABvnhJPlrc6KTTRI2aaT/exec"; 
+// ⚠️ IMPORTANT: Aapka Google Script Web App URL
+const API_URL = "https://script.google.com/macros/s/AKfycbyNt5NnjiXlniZkMtSSDixsTgg9vlJZeG0pbjvV0CO-4Bn-ppKDLwoZgJb88Jwopdc/exec"; 
 
 let questions = [];
 let current = 0;
 let answers = {};
 let skippedQuestions = [];
 
-// Lock fixed value for 30 minutes (1800 seconds)
 let examKaPakkaTime = 1800; 
 let timerInterval;
 let generatedOTP = null;
@@ -88,7 +87,7 @@ function verifyOTP() {
   }
 }
 
-/* ================= 3. START QUIZ (🔥 FIXED FOR NETLIFY) ================= */
+/* ================= 3. START QUIZ ================= */
 function startQuiz() {
   document.getElementById("page1").style.display = "none";
   document.getElementById("page2").style.display = "block";
@@ -101,7 +100,6 @@ function startQuiz() {
     verifyBtn.style.opacity = "1";
   }
 
-  // 🔥 CORS FIX: Netlify par purana fetch crash ho raha tha, ab ye bina block hue load karega
   const scriptId = "questionsScriptTag";
   const oldScript = document.getElementById(scriptId);
   if (oldScript) oldScript.remove();
@@ -112,14 +110,13 @@ function startQuiz() {
   document.body.appendChild(script);
 }
 
-// 🔥 Naya response handler jo questions aate hi timer chalu kar dega
 window.handleQuestionsResponse = function(data) {
   questions = data.filter(q => q && q.question && String(q.question).trim() !== "");
   current = 0;
   if (questions.length > 0) {
     renderQuestionNumbers();
     showQuestion();
-    startTimer(); // Yahan se timer 100% chalega!
+    startTimer(); 
   } else {
     alert("Google Sheet me koi question nahi mila!");
   }
@@ -128,7 +125,7 @@ window.handleQuestionsResponse = function(data) {
 /* ================= 4. TIMER LOGIC ================= */
 function startTimer() {
   clearInterval(timerInterval);
-  examKaPakkaTime = 1800; // Force load 30 mins
+  examKaPakkaTime = 1800; 
   updateTimerDisplay(); 
 
   timerInterval = setInterval(() => {
@@ -327,6 +324,7 @@ function submitQuiz() {
   let studentEmail = document.getElementById("email").value;
   let studentMobile = document.getElementById("mobile").value;
 
+  // Live Link (GitHub) ke liye JSONP format me data send ho raha hai
   const saveResultScript = document.createElement('script');
   const params = new URLSearchParams({
     action: "saveResult",
@@ -339,11 +337,16 @@ function submitQuiz() {
     attempted: attempted,
     percentage: finalPercentage + "%",
     discount: discountPercent,
-    status: statusText
+    status: statusText,
+    callback: "handleSaveResponse" 
   });
   
   saveResultScript.src = `${API_URL}?${params.toString()}`;
   document.body.appendChild(saveResultScript);
+
+  window.handleSaveResponse = function(response) {
+    console.log("Data successfully received in sheet:", response);
+  };
 
   document.getElementById("page2").style.display = "none"; 
   document.getElementById("page3").style.display = "block";
