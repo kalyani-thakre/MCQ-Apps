@@ -1,15 +1,17 @@
-// ⚠️ IMPORTANT: Yahan apna naya Deploy kiya hua Web App URL daaliye
-const API_URL = "https://script.google.com/macros/s/AKfycbw55ZMLLmDYNGe-cOPm7nPXgiFDMF7G_NsBBisG2u5j0YkyzpCrAHFJ-yT-tc8cUOjO/exec"; 
+// ⚠️ IMPORTANT: Yahan apna Google Script Web App URL hi rehne dena
+const API_URL = "https://script.google.com/macros/s/AKfycbwRLlPsaavYxnvD8U7jzDGV_fheVF5PVVHNW1u26kQlL3PWABvnhJPlrc6KTTRI2aaT/exec"; 
 
 let questions = [];
 let current = 0;
 let answers = {};
 let skippedQuestions = [];
-let time = 120;
+
+// Lock fixed value for 30 minutes (1800 seconds)
+let examKaPakkaTime = 1800; 
 let timerInterval;
 let generatedOTP = null;
 
-/* ================= 1. DIRECT EMAIL OTP ROUTE ================= */
+/* ================= 1. DIRECT EMAIL OTP LOGIC ================= */
 function sendOTP() {
   let name = document.getElementById("name").value.trim();
   let email = document.getElementById("email").value.trim();
@@ -86,8 +88,8 @@ function verifyOTP() {
   }
 }
 
-/* ================= 3. START QUIZ ================= */
-function startQuiz(){
+/* ================= 3. START QUIZ (🔥 FIXED FOR NETLIFY) ================= */
+function startQuiz() {
   document.getElementById("page1").style.display = "none";
   document.getElementById("page2").style.display = "block";
   document.getElementById("quiz").innerHTML = `<h2>Loading Question...</h2>`;
@@ -99,72 +101,93 @@ function startQuiz(){
     verifyBtn.style.opacity = "1";
   }
 
-  fetch(API_URL)
-    .then(response => response.json())
-    .then(data => {
-      questions = data.filter(q => q && q.question && String(q.question).trim() !== "");
-      current = 0;
-      renderQuestionNumbers();
-      showQuestion();
-      startTimer();
-    })
-    .catch(err => {
-      console.error(err);
-      alert("Error loading questions. Please check your Google Sheet.");
-    });
+  // 🔥 CORS FIX: Netlify par purana fetch crash ho raha tha, ab ye bina block hue load karega
+  const scriptId = "questionsScriptTag";
+  const oldScript = document.getElementById(scriptId);
+  if (oldScript) oldScript.remove();
+
+  const script = document.createElement('script');
+  script.id = scriptId;
+  script.src = `${API_URL}?callback=handleQuestionsResponse`;
+  document.body.appendChild(script);
 }
 
-/* ================= 4. TIMER ================= */
-function startTimer(){
+// 🔥 Naya response handler jo questions aate hi timer chalu kar dega
+window.handleQuestionsResponse = function(data) {
+  questions = data.filter(q => q && q.question && String(q.question).trim() !== "");
+  current = 0;
+  if (questions.length > 0) {
+    renderQuestionNumbers();
+    showQuestion();
+    startTimer(); // Yahan se timer 100% chalega!
+  } else {
+    alert("Google Sheet me koi question nahi mila!");
+  }
+};
+
+/* ================= 4. TIMER LOGIC ================= */
+function startTimer() {
   clearInterval(timerInterval);
-  timerInterval = setInterval(()=>{
-    let min = Math.floor(time / 60);
-    let sec = time % 60;
-    document.getElementById("timer").innerHTML = `${min}:${sec < 10 ? "0"+sec : sec}`;
-    if(time > 0){ 
-      time--; 
-    } else { 
+  examKaPakkaTime = 1800; // Force load 30 mins
+  updateTimerDisplay(); 
+
+  timerInterval = setInterval(() => {
+    if (examKaPakkaTime <= 0) { 
       clearInterval(timerInterval); 
       submitQuiz(); 
+      return;
     }
-  },1000);
+    examKaPakkaTime--; 
+    updateTimerDisplay();
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  let min = Math.floor(examKaPakkaTime / 60);
+  let sec = examKaPakkaTime % 60;
+  let timerElement = document.getElementById("timer");
+  if (timerElement) {
+    timerElement.innerHTML = `${min < 10 ? "0"+min : min}:${sec < 10 ? "0"+sec : sec}`;
+  }
 }
 
 /* ================= 5. EXAM GRID & DISPLAY ================= */
-function renderQuestionNumbers(){
+function renderQuestionNumbers() {
   let html = "";
-  questions.forEach((q,i)=>{
+  questions.forEach((q, i) => {
     html += `<div class="qnum" id="num${i}" onclick="goToQuestion(${i})">${i+1}</div>`;
   });
   document.getElementById("questionNumbers").innerHTML = html;
 }
 
-function updateQuestionColors(){
-  questions.forEach((q,i)=>{
+function updateQuestionColors() {
+  questions.forEach((q, i) => {
     let box = document.getElementById(`num${i}`);
-    if(!box) return;
-    box.classList.remove("current","answered","skipped");
-    if(answers[i]){ box.classList.add("answered"); }
-    else if(skippedQuestions.includes(i)){ box.classList.add("skipped"); }
-    else if(i === current){ box.classList.add("current"); }
+    if (!box) return;
+    box.classList.remove("current", "answered", "skipped");
+    if (answers[i]) { box.classList.add("answered"); }
+    else if (skippedQuestions.includes(i)) { box.classList.add("skipped"); }
+    if (i === current) { box.classList.add("current"); }
   });
 }
 
-function goToQuestion(index){ saveAnswer(); current = index; showQuestion(); }
+function goToQuestion(index) { saveAnswer(); current = index; showQuestion(); }
 
 function checkSubmitButtonVisibility() {
-  let total = questions.length;
-  let attempted = Object.keys(answers).length;
-  
-  if(attempted === total && total > 0){ 
-    document.getElementById("submitBtn").style.display = "block"; 
+  let submitBtn = document.getElementById("submitBtn");
+  if (!submitBtn || questions.length === 0) return;
+
+  if (current === questions.length - 1) { 
+    submitBtn.style.setProperty('display', 'block', 'important');
   } else { 
-    document.getElementById("submitBtn").style.display = "none"; 
+    submitBtn.style.setProperty('display', 'none', 'important');
   }
 }
 
-function showQuestion(){
-  if(current >= questions.length){ submitQuiz(); return; }
+function showQuestion() {
+  if (questions.length === 0) return; 
+  if (current >= questions.length) { current = questions.length - 1; }
+  
   updateQuestionColors();
   let q = questions[current];
   document.getElementById("qcount").innerHTML = `Question ${current+1} / ${questions.length}`;
@@ -181,7 +204,7 @@ function showQuestion(){
               <input type="text" id="typedAnswer" class="option" style="width:100%; padding:12px; font-size:16px; border:1px solid #ccc; border-radius:4px;" placeholder="Type your answer here..." value="${savedText}" oninput="saveAnswer()">
              </div>`;
   } else {
-    if(validOptions.length === 1 && (String(validOptions[0]).trim().toLowerCase() === "true" || String(validOptions[0]).trim().toLowerCase() === "false")) {
+    if (validOptions.length === 1 && (String(validOptions[0]).trim().toLowerCase() === "true" || String(validOptions[0]).trim().toLowerCase() === "false")) {
       validOptions = ["True", "False"];
     }
 
@@ -195,7 +218,7 @@ function showQuestion(){
   checkSubmitButtonVisibility();
 }
 
-function saveAnswer(){
+function saveAnswer() {
   if (questions.length === 0 || !questions[current]) return;
   let q = questions[current];
   let validOptions = [];
@@ -205,42 +228,47 @@ function saveAnswer(){
   
   if (validOptions.length === 0) {
     let typedVal = document.getElementById("typedAnswer") ? document.getElementById("typedAnswer").value.trim() : "";
-    if(typedVal !== "") {
+    if (typedVal !== "") {
       answers[current] = typedVal;
       let box = document.getElementById(`num${current}`);
-      if(box) box.classList.add("answered");
+      if (box) box.classList.add("answered");
     } else {
       delete answers[current];
       let box = document.getElementById(`num${current}`);
-      if(box) box.classList.remove("answered");
+      if (box) box.classList.remove("answered");
     }
   } else {
     let selected = document.querySelector('input[name="option"]:checked');
-    if(selected){
+    if (selected) {
       answers[current] = selected.value;
       let boxReal = document.getElementById(`num${current}`);
-      if(boxReal) boxReal.classList.add("answered");
+      if (boxReal) boxReal.classList.add("answered");
     }
   }
-  checkSubmitButtonVisibility();
 }
 
-function previousQuestion(){ saveAnswer(); if(current > 0){ current--; showQuestion(); } }
-function nextQuestion(){ saveAnswer(); if(current < questions.length - 1){ current++; showQuestion(); } }
+function previousQuestion() { saveAnswer(); if (current > 0) { current--; showQuestion(); } }
+function nextQuestion() { 
+  saveAnswer(); 
+  if (current < questions.length - 1) { 
+    current++; 
+    showQuestion(); 
+  }
+}
 
 window.skipQuestion = function() {
   if (!skippedQuestions.includes(current)) {
     skippedQuestions.push(current);
   }
-  if(current < questions.length - 1){ 
+  if (current < questions.length - 1) { 
     current++; 
     showQuestion(); 
   }
 };
 
 /* ================= 6. SUBMIT QUIZ ================= */
-function submitQuiz(){
-  if(questions.length === 0) return;
+function submitQuiz() {
+  if (questions.length === 0) return;
   clearInterval(timerInterval);
   
   if (document.getElementById("typedAnswer")) {
@@ -281,48 +309,41 @@ function submitQuiz(){
     statusColor = "red";
     finalPercentage = "0.00"; 
   } else {
-    statusText = parseFloat(finalPercentage) >= 35 ? "PASS " : "FAIL ";
+    statusText = parseFloat(finalPercentage) >= 35 ? "PASS ✅" : "FAIL ❌";
     statusColor = parseFloat(finalPercentage) >= 35 ? "green" : "red";
   }
 
-  // ================= DISCOUNT CALCULATION FOR SHEET & SCREEN =================
   let discountPercent = "0%";
   let pNum = parseFloat(finalPercentage);
 
-  if (statusText.includes("FAIL") || attempted === 0) {
-    discountPercent = "0%";
-  } else {
-    if (pNum >= 90 && pNum <= 100) {
-      discountPercent = "30%";
-    } else if (pNum >= 80 && pNum < 90) {
-      discountPercent = "25%";
-    } else if (pNum >= 50 && pNum < 80) {
-      discountPercent = "20%";
-    } else if (pNum >= 35 && pNum < 50) {
-      discountPercent = "10%";
-    }
+  if (!statusText.includes("FAIL") && attempted > 0) {
+    if (pNum >= 90 && pNum <= 100) discountPercent = "30%";
+    else if (pNum >= 80 && pNum < 90) discountPercent = "25%";
+    else if (pNum >= 50 && pNum < 80) discountPercent = "20%";
+    else if (pNum >= 35 && pNum < 50) discountPercent = "10%";
   }
 
   let studentName = document.getElementById("name").value;
   let studentEmail = document.getElementById("email").value;
   let studentMobile = document.getElementById("mobile").value;
 
-  // ✨ DO NO DATA KO ALAG ALAG BHEJ RAHE HAIN EXCEL MEIN SAVE KARNE KE LIYE
-  fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      name: studentName,
-      email: studentEmail,
-      mobile: studentMobile,
-      score: totalScore,
-      correct: correctCount,
-      wrong: wrong,
-      attempted: attempted,
-      percentage: finalPercentage + "%",  // Column H me original marks % jayenge
-      discount: discountPercent,          // Column I me discount % jayega
-      status: statusText 
-    })
-  }).catch(e => console.log("Sheet saving bypassed or offline:", e));
+  const saveResultScript = document.createElement('script');
+  const params = new URLSearchParams({
+    action: "saveResult",
+    name: studentName,
+    email: studentEmail,
+    mobile: studentMobile,
+    score: totalScore,
+    correct: correctCount,
+    wrong: wrong,
+    attempted: attempted,
+    percentage: finalPercentage + "%",
+    discount: discountPercent,
+    status: statusText
+  });
+  
+  saveResultScript.src = `${API_URL}?${params.toString()}`;
+  document.body.appendChild(saveResultScript);
 
   document.getElementById("page2").style.display = "none"; 
   document.getElementById("page3").style.display = "block";
@@ -338,10 +359,7 @@ function submitQuiz(){
   resultHtml += "<p><b>Wrong Answers :</b> " + wrong + "</p>";
   resultHtml += "<p><b>Raw Score :</b> " + totalScore + "</p>";
   resultHtml += "<hr style='border: 0.5px dashed #ccc; margin: 20px auto; width: 80%;'>";
-  
-  // Student ko screen par sirf unka Final Discount hi dikhega bina kisi confusion ke
   resultHtml += "<p style='font-size: 24px; margin-top: 15px;'><b>Final Discount :</b><br><b style='color: #083b91; font-size: 44px;'>" + discountPercent + "</b></p>";
-  
   resultHtml += "<p style='font-size: 22px; margin-top: 15px;'><b>Result Status :</b><br><b style='color: " + statusColor + "; font-size: 30px;'>" + statusText + "</b></p>";
   resultHtml += "</div></div>";
 

@@ -14,7 +14,6 @@ body {
   padding: 25px;
   border-radius: 20px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-  /* IMPORTANT */
   position: relative;
   box-sizing: border-box;
 }
@@ -28,23 +27,23 @@ h1 {
   font-weight: bold;
 }
 
-/* ================= ✨ PAGE 1 (COMPACT & PERFECTLY ALIGNED) ================= */
+/* ================= ✨ PAGE 1 ================= */
 #page1 {
-  max-width: 380px;         /* Pure login box ki width ko compact kiya */
-  margin: 0 auto;           /* Pure form box ko screen ke center me laya */
+  max-width: 380px;         
+  margin: 0 auto;           
   padding: 10px;
 }
 
 .user-details {
   display: flex;
   flex-direction: column;
-  gap: 12px;                /* Inputs ke beech ka perfect gap */
+  gap: 12px;                
   margin-bottom: 15px;
 }
 
 .user-details input {
-  width: 100%;              /* Form width ke hisab se full line me aayega */
-  padding: 10px 14px;       /* Slim height ke liye padding kam ki */
+  width: 100%;              
+  padding: 10px 14px;       
   border: 1px solid #c7d2fe;
   border-radius: 10px;      
   font-size: 15px;          
@@ -58,57 +57,50 @@ h1 {
   border: 1px solid #0b57d0;
 }
 
-/* Send OTP Button - Ab inputs ki line me left-aligned rahega */
 #sendOtpBtn {
-  width: 100% !important;   /* Inputs ki tarah full width block space lega */
+  width: 100% !important;   
   padding: 12px 14px;       
   font-size: 16px;
-  background: #0b57d0;      /* Blue color */
-  margin: 5px 0 0 0 !important; /* Margin set karke left align kiya */
+  background: #0b57d0;      
+  margin: 5px 0 0 0 !important; 
   display: block;           
-  text-align: center;       /* Text button ke andar center rahega */
+  text-align: center;       
 }
 
-/* OTP Fill karne wala input box - AB EKDUM CHOTA AUR SLIM HAI */
 #otpInput {
-  width: 65px !important;   /* Size ko ghata kar 65px kiya taaki box ekdum chota ho jaye */
-  padding: 6px 8px;         /* Height aur side spacing ko kam kiya */
-  text-align: center;       /* OTP digits center me type honge */
+  width: 65px !important;   
+  padding: 6px 8px;         
+  text-align: center;       
   font-size: 15px;          
   font-weight: bold;
   border: 2px solid #c7d2fe;
   border-radius: 6px;
   background: #f8fbff;
-  margin: 0 0 10px 0 !important; /* Margin 0 karne se ye left me shuru hoga */
+  margin: 0 0 10px 0 !important; 
   display: block;
 }
 
-/* Placeholder (OTP) text styling inside the box */
 #otpInput::placeholder {
   color: #a5b4fc;
   font-weight: normal;      
-  font-size: 13px;          /* Placeholder ka text thoda chota kiya taaki fit aaye */
+  font-size: 13px;          
 }
 
-/* Verify OTP Button - Ab inputs ki line me left-aligned rahega */
 #verifyOtpBtn {
   width: 100% !important;   
   padding: 12px 14px;
   font-size: 16px;
-  background: #16a34a;      /* Green color */
-  margin: 5px 0 0 0 !important; /* Left alignment */
+  background: #16a34a;      
+  margin: 5px 0 0 0 !important; 
   display: block;
   text-align: center;
 }
 
-/* CONTAINER FOR OTP */
 #otpContainer {
   margin-top: 15px;
-  text-align: left;         /* Iske andar ke saare elements left se shuru honge */
+  text-align: left;         
   width: 100%;
 }
-
-/* ======================================================================================= */
 
 /* GLOBAL BUTTON STYLE */
 button {
@@ -257,22 +249,11 @@ button:hover {
   transform: scale(1.08);
 }
 
-/* ANSWERED */
-.answered {
-  background: #16a34a;
-}
+.answered { background: #16a34a; }
+.current { background: #0b57d0; }
+.skipped { background: #ff9800; }
 
-/* CURRENT QUESTION */
-.current {
-  background: #0b57d0;
-}
-
-/* SKIPPED QUESTION */
-.skipped {
-  background: #ff9800;
-}
-
-/* ================= ✨ RESULT PAGE STYLE (CENTER ALIGNED) ================= */
+/* ================= ✨ RESULT PAGE STYLE ================= */
 #result {
   margin-top: 20px;
   text-align: center;
@@ -290,60 +271,32 @@ button:hover {
   color: #333;
 }
 
-/* TIMER */
+/* 🛠️ FIXED TIMER FOR NETLIFY (No hiding, perfectly aligned) */
 #timer {
-  position: absolute;
-  top: -40px;
-  right: 0;
-  z-index: 99999;
-  background: none;
-  border: none;
-  box-shadow: none;
-  color: black;
-  font-weight: bold;
-  font-size: 18px;
-  padding: 0;
+  font-size: 32px !important;
+  font-weight: bold !important;
+  color: #000000 !important;
+  text-align: right !important;
+  margin-bottom: 10px !important;
+  width: 100% !important;
+  display: block !important;
+  font-family: monospace, sans-serif !important;
 }
 
 /* MOBILE FRIENDLY */
 @media screen and (max-width: 768px) {
-  body {
-    padding: 10px;
-  }
-
-  .container {
-    width: 100%;
-    padding: 15px;
-  }
-
-  .exam-layout {
-    flex-direction: column;
-  }
-
-  .btn-row {
-    flex-direction: column;
-  }
-
-  button:not(#sendOtpBtn):not(#verifyOtpBtn) {
-    width: 100%;
-  }
-
-  .question-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  .question {
-    font-size: 20px;
-  }
-
-  h1 {
-    font-size: 26px;
-  }
-
+  body { padding: 10px; }
+  .container { width: 100%; padding: 15px; }
+  .exam-layout { flex-direction: column; }
+  .btn-row { flex-direction: column; }
+  button:not(#sendOtpBtn):not(#verifyOtpBtn) { width: 100%; }
+  .question-grid { grid-template-columns: repeat(4, 1fr); }
+  .question { font-size: 20px; }
+  h1 { font-size: 26px; }
+  
   #timer {
-    top: -40px;
-    right: 0;
-    font-size: 14px;
-    padding: 0;
+    text-align: center !important;
+    font-size: 28px !important;
+    margin-bottom: 15px !important;
   }
 }
