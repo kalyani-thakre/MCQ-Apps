@@ -1,5 +1,5 @@
 // ⚠️ IMPORTANT: Aapka Google Script Web App URL
-const API_URL = "https://script.google.com/macros/s/AKfycbxH4QSlQps7n8I6s9OmMRjXGL2Wcfj0aMWLydKxaAEGBTOAzoKyGjJBeLlej4IOjPkt/exec"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbz1llIC2C0JcAVVBq7x1fAfAoM4lmaB20y1W5u2usaZduEQ6UnhVhJ1Fq5XR73KpkQx/exec"; 
 
 let questions = [];
 let current = 0;
@@ -372,10 +372,9 @@ function submitQuiz() {
   resultHtml += "<h2 style='color: #083b91; font-size: 28px; margin-top: 0;'>Exam Result</h2>";
   resultHtml += "<div style='font-size: 18px; line-height: 1.8; color: #333;'>";
   resultHtml += "<p><b>Name :</b> " + studentName + "</p>";
-  
-  // MODIFIED LINE: 47 (totalScoreEarned) hata diya hai
-  resultHtml += "<p style='font-size: 20px;'><b>Total Marks Obtained :</b> <span style='color:#083b91; font-weight:bold;'>" + " / " + maxPossibleMarks + "</span></p>";
-  
+  resultHtml += "<p><b>Attempted :</b> " + attempted + " / " + totalQuestions + "</p>";
+  resultHtml += "<p><b>Correct Answers :</b> " + correctCount + "</p>";
+  resultHtml += "<p style='font-size: 20px;'><b>Total Marks Obtained :</b> <span style='color:#083b91; font-weight:bold;'>" + totalScoreEarned + " / " + maxPossibleMarks + "</span></p>";
   resultHtml += "<hr style='border: 0.5px dashed #ccc; margin: 20px auto; width: 80%;'>";
   resultHtml += "<p style='font-size: 24px; margin-top: 15px;'><b>Final Discount :</b><br><b style='color: #083b91; font-size: 44px;'>" + discountPercent + "</b></p>";
   resultHtml += "<p style='font-size: 22px; margin-top: 15px;'><b>Result Status :</b><br><b style='color: " + statusColor + "; font-size: 30px;'>" + statusText + "</b></p>";
