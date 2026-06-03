@@ -1,5 +1,5 @@
 // ⚠️ IMPORTANT: Aapka Google Script Web App URL
-const API_URL = "https://script.google.com/macros/s/AKfycbx-5UTqa4kyR0IOihe9O33gdiFxtznua2FQzyxEnekKCa2MtsTCRNmB3r4sR-am3kc9/exec"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbyWIiWEgb6BFmUc4pL2wpoJGl2WXEiRGI0t8fCnalH3u5tPeoQi4dpXgVHkLYVzxWrM/exec"; 
 
 let questions = [];
 let current = 0;
@@ -288,18 +288,24 @@ function submitQuiz() {
     saveAnswer();
   }
   
+  let totalScoreEarned = 0; 
+  let maxPossibleMarks = 0; 
   let correctCount = 0; 
   let wrong = 0;
   let totalQuestions = questions.length; 
   
   for (let i = 0; i < totalQuestions; i++) {
     let q = questions[i];
+    let questionWeight = q.marks ? Number(q.marks) : 1;
+    maxPossibleMarks += questionWeight;
+
     let studentAns = answers[i] ? String(answers[i]).trim().toLowerCase() : "";
     let correctAns = q.answer ? String(q.answer).trim().toLowerCase() : "";
     
     if (studentAns !== "") {
       if (studentAns === correctAns) {
         correctCount++;
+        totalScoreEarned += questionWeight;
       } else {
         wrong++;
       }
@@ -309,37 +315,28 @@ function submitQuiz() {
   }
   
   let attempted = Object.keys(answers).length;
-  
-  let actualPercentage = (correctCount / totalQuestions) * 100;
+  let actualPercentage = maxPossibleMarks > 0 ? (totalScoreEarned / maxPossibleMarks) * 100 : 0;
   let finalPercentage = actualPercentage.toFixed(2);
 
-  let statusText = "";
-  let statusColor = "";
+  let statusText = (actualPercentage >= 50) ? "PASS ✅" : "FAIL ❌";
+  let statusColor = (actualPercentage >= 50) ? "green" : "red";
 
-  if (correctCount >= 15 && attempted > 0) {
-    statusText = "PASS ✅";
-    statusColor = "green";
-  } else {
-    statusText = "FAIL ❌";
-    statusColor = "red";
-  }
-
-  // Score aur Discount ke aadhar par custom message
+  // 🎉 DISCOUNT & MESSAGE LOGIC
   let discountPercent = "0%";
   let customMessage = ""; 
 
-  if (correctCount === totalQuestions) {
+  if (actualPercentage === 100) {
     discountPercent = "30%"; 
-    customMessage = "🎉 <b>Outstanding!</b> You got a perfect score and successfully unlocked a <b>Special 30% Scholarship Discount</b>!";
-  } else if (correctCount >= 25 && correctCount < totalQuestions) {
+    customMessage = "🎉 <b>Outstanding!</b> You got a perfect score. You have earned a Special 30% Scholarship Discount!";
+  } else if (actualPercentage >= 80 && actualPercentage < 100) {
     discountPercent = "20%"; 
-    customMessage = "🌟 <b>Brilliant Performance!</b> Your hard work earned you a wonderful <b>20% Admission Discount</b>!";
-  } else if (correctCount >= 15 && correctCount < 25) {
+    customMessage = "🌟 <b>Brilliant Performance!</b> You have successfully earned a 20% Scholarship Discount!";
+  } else if (actualPercentage >= 50 && actualPercentage < 80) {
     discountPercent = "10%"; 
-    customMessage = "👍 <b>Good Job!</b> You passed the exam and successfully unlocked a <b>10% Discount</b>!";
+    customMessage = "👍 <b>Good Job!</b> You passed the exam and received a 10% Discount!";
   } else {
     discountPercent = "0%";  
-    customMessage = "✨ <b>Hard Luck!</b> Better luck next time. Practice more to clear the exam and unlock amazing discount benefits.";
+    customMessage = "✨ <b>Hard Luck!</b> Please try again to clear the exam and unlock exciting discounts.";
   }
 
   let studentName = document.getElementById("name").value;
@@ -352,7 +349,7 @@ function submitQuiz() {
     name: studentName,
     email: studentEmail,
     mobile: studentMobile,
-    score: correctCount, 
+    score: totalScoreEarned,
     correct: correctCount,
     wrong: wrong,
     attempted: attempted,
@@ -380,14 +377,12 @@ function submitQuiz() {
   resultHtml += "<p><b>Name :</b> " + studentName + "</p>";
   resultHtml += "<p><b>Attempted :</b> " + attempted + " / " + totalQuestions + "</p>";
   resultHtml += "<p><b>Correct Answers :</b> " + correctCount + "</p>";
-  resultHtml += "<p><b>Wrong Answers :</b> " + wrong + "</p>";
-  resultHtml += "<p><b>Total Score :</b> " + correctCount + "</p>";
+  resultHtml += "<p><b>Total Score :</b> <span style='color:#083b91; font-weight:bold; font-size:22px;'>" + totalScoreEarned + "</span> / " + maxPossibleMarks + " Marks</p>";
   resultHtml += "<hr style='border: 0.5px dashed #ccc; margin: 20px auto; width: 80%;'>";
   resultHtml += "<p style='font-size: 24px; margin-top: 15px;'><b>Final Discount :</b><br><b style='color: #083b91; font-size: 44px;'>" + discountPercent + "</b></p>";
   resultHtml += "<p style='font-size: 22px; margin-top: 15px;'><b>Result Status :</b><br><b style='color: " + statusColor + "; font-size: 30px;'>" + statusText + "</b></p>";
   
-  // Naya joda hua informative message section
-  resultHtml += "<p style='font-size: 15px; color: #555; background: #f4f7fc; padding: 12px; border-radius: 8px; margin-top: 20px; line-height: 1.5;'>" + customMessage + "</p>";
+  resultHtml += "<p style='font-size: 16px; color: #444; background: #f4f7fc; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 5px solid #083b91;'>" + customMessage + "</p>";
   
   resultHtml += "</div></div>";
 
