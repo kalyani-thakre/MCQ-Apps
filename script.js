@@ -1,5 +1,5 @@
 // ⚠️ IMPORTANT: Aapka Google Script Web App URL
-const API_URL = "https://script.google.com/macros/s/AKfycbxGfu7oVdzbN1vhzcDJcrOc0rhewthcTConOZAOQq8b7ebUPduIh_T65arEpAKaZZmf/exec"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbxnnCMaQtPtzFaCRv6pO5mevepfvRqbeZrr-G9gcjfOdIztQeIG5IVF6sGWwZ2kvaY-/exec"; 
 
 let questions = [];
 let current = 0;
