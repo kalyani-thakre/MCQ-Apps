@@ -1,5 +1,5 @@
 // ⚠️ IMPORTANT: Aapka Google Script Web App URL
-const API_URL = "https://script.google.com/macros/s/AKfycbz1llIC2C0JcAVVBq7x1fAfAoM4lmaB20y1W5u2usaZduEQ6UnhVhJ1Fq5XR73KpkQx/exec"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbwgzxu2iSO9-jGoAbH4HCfv_MQ9huBc4XyOjaD5peTchtZeDgndoGupOEOhmJ9zRS0G/exec"; 
 
 let questions = [];
 let current = 0;
@@ -374,6 +374,7 @@ function submitQuiz() {
   resultHtml += "<p><b>Name :</b> " + studentName + "</p>";
   resultHtml += "<p><b>Attempted :</b> " + attempted + " / " + totalQuestions + "</p>";
   resultHtml += "<p><b>Correct Answers :</b> " + correctCount + "</p>";
+  resultHtml += "<p><b>Wrong Answers :</b> " + wrong + "</p>";
   resultHtml += "<p style='font-size: 20px;'><b>Total Marks Obtained :</b> <span style='color:#083b91; font-weight:bold;'>" + totalScoreEarned + " / " + maxPossibleMarks + "</span></p>";
   resultHtml += "<hr style='border: 0.5px dashed #ccc; margin: 20px auto; width: 80%;'>";
   resultHtml += "<p style='font-size: 24px; margin-top: 15px;'><b>Final Discount :</b><br><b style='color: #083b91; font-size: 44px;'>" + discountPercent + "</b></p>";
