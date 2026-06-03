@@ -207,10 +207,6 @@ function showQuestion() {
               <input type="text" id="typedAnswer" class="option" style="width:100%; padding:12px; font-size:16px; border:1px solid #ccc; border-radius:4px;" placeholder="Type your answer here..." value="${savedText}" oninput="saveAnswer()">
              </div>`;
   } else {
-    if (validOptions.length === 1 && (String(validOptions[0]).trim().toLowerCase() === "true" || String(validOptions[0]).trim().toLowerCase() === "false")) {
-      validOptions = ["True", "False"];
-    }
-
     validOptions.forEach(opt => {
       let checked = answers[current] === opt ? "checked" : "";
       html += `<label class="option"><input type="radio" name="option" value="${opt}" ${checked} onchange="saveAnswer()"> ${opt}</label>`;
@@ -267,7 +263,9 @@ function nextQuestion() {
   }
 }
 
+// YAHAN SKIP BUTTON KA LOGIC UPDATE HUA HAI (ANSWER UNSAVE HOGA)
 window.skipQuestion = function() {
+  delete answers[current]; // Answer unsave ho jayega
   if (!skippedQuestions.includes(current)) {
     skippedQuestions.push(current);
   }
@@ -277,9 +275,10 @@ window.skipQuestion = function() {
   } else {
     checkSubmitButtonVisibility();
   }
+  updateQuestionColors();
 };
 
-/* ================= 6. SUBMIT QUIZ - MARKS CALCULATION LOGIC ================= */
+/* ================= 6. SUBMIT QUIZ ================= */
 function submitQuiz() {
   if (questions.length === 0) return;
   clearInterval(timerInterval);
@@ -319,23 +318,8 @@ function submitQuiz() {
   
   let statusText = (actualPercentage >= 50) ? "PASS ✅" : "FAIL ❌";
   let statusColor = (actualPercentage >= 50) ? "green" : "red";
-
-  let discountPercent = "0%";
-  let customMessage = ""; 
-
-  if (actualPercentage === 100) {
-    discountPercent = "30%"; 
-    customMessage = "🎉 <b>Outstanding!</b> You got a perfect score. You have earned a Special 30% Scholarship Discount!";
-  } else if (actualPercentage >= 80 && actualPercentage < 100) {
-    discountPercent = "20%"; 
-    customMessage = "🌟 <b>Brilliant Performance!</b> You have successfully earned a 20% Scholarship Discount!";
-  } else if (actualPercentage >= 50 && actualPercentage < 80) {
-    discountPercent = "10%"; 
-    customMessage = "👍 <b>Good Job!</b> You passed the exam and received a 10% Discount!";
-  } else {
-    discountPercent = "0%";  
-    customMessage = "✨ <b>Hard Luck!</b> Please try again to clear the exam and unlock exciting discounts.";
-  }
+  let discountPercent = (actualPercentage >= 50) ? (actualPercentage >= 100 ? "30%" : (actualPercentage >= 80 ? "20%" : "10%")) : "0%";
+  let customMessage = (actualPercentage >= 50) ? "🎉 Congratulations! You have unlocked your scholarship discount." : "✨ Hard Luck! Please try again to clear the exam.";
 
   let studentName = document.getElementById("name").value;
   let studentEmail = document.getElementById("email").value;
@@ -367,23 +351,19 @@ function submitQuiz() {
   document.getElementById("page2").style.display = "none"; 
   document.getElementById("page3").style.display = "block";
   
-  let resultHtml = "";
-  resultHtml += "<div style='text-align: center; max-width: 450px; margin: 0 auto; padding: 25px; font-family: sans-serif; background: #ffffff; border-radius: 12px;'>";
-  resultHtml += "<h2 style='color: #083b91; font-size: 28px; margin-top: 0;'>Exam Result</h2>";
-  resultHtml += "<div style='font-size: 18px; line-height: 1.8; color: #333;'>";
-  resultHtml += "<p><b>Name :</b> " + studentName + "</p>";
-  resultHtml += "<p><b>Attempted :</b> " + attempted + " / " + totalQuestions + "</p>";
-  resultHtml += "<p><b>Correct Answers :</b> " + correctCount + "</p>";
-  resultHtml += "<p><b>Wrong Answers :</b> " + wrong + "</p>";
-  
-  // YAHAN SIRF SCORE DIKHEGA, 50 WALA HISSA HATA DIYA GAYA HAI
-  resultHtml += "<p style='font-size: 20px;'><b>Total Score :</b> <span style='color:#083b91; font-weight:bold;'>" + totalScoreEarned + " Marks</span></p>";
-  
-  resultHtml += "<hr style='border: 0.5px dashed #ccc; margin: 20px auto; width: 80%;'>";
-  resultHtml += "<p style='font-size: 24px; margin-top: 15px;'><b>Final Discount :</b><br><b style='color: #083b91; font-size: 44px;'>" + discountPercent + "</b></p>";
-  resultHtml += "<p style='font-size: 22px; margin-top: 15px;'><b>Result Status :</b><br><b style='color: " + statusColor + "; font-size: 30px;'>" + statusText + "</b></p>";
-  resultHtml += "<p style='font-size: 16px; color: #444; background: #f4f7fc; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 5px solid #083b91;'>" + customMessage + "</p>";
-  resultHtml += "</div></div>";
-
-  document.getElementById("result").innerHTML = resultHtml;
+  document.getElementById("result").innerHTML = `
+    <div style='text-align: center; max-width: 450px; margin: 0 auto; padding: 25px; font-family: sans-serif; background: #ffffff; border-radius: 12px;'>
+      <h2 style='color: #083b91; font-size: 28px; margin-top: 0;'>Exam Result</h2>
+      <div style='font-size: 18px; line-height: 1.8; color: #333;'>
+        <p><b>Name :</b> ${studentName}</p>
+        <p><b>Attempted :</b> ${attempted} / ${totalQuestions}</p>
+        <p><b>Correct Answers :</b> ${correctCount}</p>
+        <p><b>Wrong Answers :</b> ${wrong}</p>
+        <p style='font-size: 20px;'><b>Total Score :</b> <span style='color:#083b91; font-weight:bold;'>${totalScoreEarned} Marks</span></p>
+        <hr style='border: 0.5px dashed #ccc; margin: 20px auto; width: 80%;'>
+        <p style='font-size: 24px;'><b>Final Discount :</b><br><b style='color: #083b91; font-size: 44px;'>${discountPercent}</b></p>
+        <p style='font-size: 22px;'><b>Result Status :</b><br><b style='color: ${statusColor}; font-size: 30px;'>${statusText}</b></p>
+        <p style='font-size: 16px; color: #444; background: #f4f7fc; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 5px solid #083b91;'>${customMessage}</p>
+      </div>
+    </div>`;
 }
