@@ -1,5 +1,5 @@
 // ⚠️ IMPORTANT: Aapka Google Script Web App URL
-const API_URL = "https://script.google.com/macros/s/AKfycbxRqn479dZi0HjhcVk-0vqmshseGBECY7vauigtyUeLrmvZOK1CSeCJXQlw0GA2Ritm/exec"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbzkMikuHMBlQdYp87yCiCqIDNnvk5ejbFktgHWXRyFjYs7GKYnSzMRzHNg3ErkPkCXQ/exec"; 
 
 let questions = [];
 let current = 0;
@@ -168,9 +168,13 @@ function updateQuestionColors() {
   });
 }
 
-function goToQuestion(index) { saveAnswer(); current = index; showQuestion(); }
+function goToQuestion(index) { 
+  saveAnswer(); 
+  current = index; 
+  showQuestion(); 
+}
 
-// ✅ EXACT FIX: Jab tak ALL 30 QUESTIONS ke answers 'answers' object me save nahi honge, button show nahi hoga.
+// 👑 FINAL FIX: Jab tak ek ek question (saare 30) solve nahi hote, Submit button 100% chhupa rahega!
 function checkSubmitButtonVisibility() {
   let submitBtn = document.getElementById("submitBtn");
   if (!submitBtn || questions.length === 0) return;
@@ -215,7 +219,7 @@ function showQuestion() {
   }
   
   document.getElementById("quiz").innerHTML = html;
-  checkSubmitButtonVisibility();
+  checkSubmitButtonVisibility(); // Sawaal load hote hi check karo
 }
 
 function saveAnswer() {
@@ -246,19 +250,24 @@ function saveAnswer() {
     }
   }
   
-  checkSubmitButtonVisibility();
+  checkSubmitButtonVisibility(); // Answer save hote hi check karo
 }
 
-function previousQuestion() { saveAnswer(); if (current > 0) { current--; showQuestion(); } }
+function previousQuestion() { 
+  saveAnswer(); 
+  if (current > 0) { current--; showQuestion(); } 
+}
+
 function nextQuestion() { 
   saveAnswer(); 
   if (current < questions.length - 1) { 
     current++; 
     showQuestion(); 
+  } else {
+    checkSubmitButtonVisibility(); // Agar aakhiri question par next dabaye tab bhi check kare
   }
 }
 
-// ✅ EXACT FIX: Skip button dabane par bhi check hoga ki submit button ko hide hi rakhna hai
 window.skipQuestion = function() {
   if (!skippedQuestions.includes(current)) {
     skippedQuestions.push(current);
@@ -267,8 +276,7 @@ window.skipQuestion = function() {
     current++; 
     showQuestion(); 
   } else {
-    // Agar bacha last question pr khada ho kr skip dabaye tab bhi check hoga
-    checkSubmitButtonVisibility();
+    checkSubmitButtonVisibility(); // Agar aakhiri question par skip dabaye tab bhi check kare
   }
 };
 
@@ -319,7 +327,7 @@ function submitQuiz() {
     statusColor = parseFloat(finalPercentage) >= 35 ? "green" : "red";
   }
 
-  // ✅ NEW DISCOUNT LOGIC (Sahi answers ki ginti ke aadhar par)
+  // ✅ NEW DISCOUNT LOGIC (Correct answers ki ginti ke aadhar par)
   let discountPercent = "0%";
   if (correctCount === 30) {
     discountPercent = "30%"; 
