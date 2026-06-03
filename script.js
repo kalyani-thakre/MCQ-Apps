@@ -1,5 +1,5 @@
 // ⚠️ IMPORTANT: Aapka Google Script Web App URL
-const API_URL = "https://script.google.com/macros/s/AKfycbyIrMXJf-x1E2cznxVMKUdSWMuMJr5n4a2aJC6KzDdU4eacZvWPfgnbm4HUOe12R-zA/exec"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbxGfu7oVdzbN1vhzcDJcrOc0rhewthcTConOZAOQq8b7ebUPduIh_T65arEpAKaZZmf/exec"; 
 
 let questions = [];
 let current = 0;
@@ -376,7 +376,7 @@ function submitQuiz() {
   resultHtml += "<p><b>Correct Answers :</b> " + correctCount + "</p>";
   resultHtml += "<p><b>Wrong Answers :</b> " + wrong + "</p>";
   
-  // YAHAN SIRF totalScoreEarned dikhega
+  // YAHAN SIRF SCORE DIKHEGA, 50 WALA HISSA HATA DIYA GAYA HAI
   resultHtml += "<p style='font-size: 20px;'><b>Total Score :</b> <span style='color:#083b91; font-weight:bold;'>" + totalScoreEarned + " Marks</span></p>";
   
   resultHtml += "<hr style='border: 0.5px dashed #ccc; margin: 20px auto; width: 80%;'>";
