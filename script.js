@@ -1,5 +1,5 @@
 // ⚠️ IMPORTANT: Aapka Google Script Web App URL
-const API_URL = "https://script.google.com/macros/s/AKfycbyNt5NnjiXlniZkMtSSDixsTgg9vlJZeG0pbjvV0CO-4Bn-ppKDLwoZgJb88Jwopdc/exec"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbxRqn479dZi0HjhcVk-0vqmshseGBECY7vauigtyUeLrmvZOK1CSeCJXQlw0GA2Ritm/exec"; 
 
 let questions = [];
 let current = 0;
@@ -170,11 +170,14 @@ function updateQuestionColors() {
 
 function goToQuestion(index) { saveAnswer(); current = index; showQuestion(); }
 
+// ✅ EXACT FIX: Jab tak ALL 30 QUESTIONS ke answers 'answers' object me save nahi honge, button show nahi hoga.
 function checkSubmitButtonVisibility() {
   let submitBtn = document.getElementById("submitBtn");
   if (!submitBtn || questions.length === 0) return;
 
-  if (current === questions.length - 1) { 
+  let totalAnswered = Object.keys(answers).length;
+
+  if (totalAnswered === questions.length) { 
     submitBtn.style.setProperty('display', 'block', 'important');
   } else { 
     submitBtn.style.setProperty('display', 'none', 'important');
@@ -242,6 +245,8 @@ function saveAnswer() {
       if (boxReal) boxReal.classList.add("answered");
     }
   }
+  
+  checkSubmitButtonVisibility();
 }
 
 function previousQuestion() { saveAnswer(); if (current > 0) { current--; showQuestion(); } }
@@ -253,6 +258,7 @@ function nextQuestion() {
   }
 }
 
+// ✅ EXACT FIX: Skip button dabane par bhi check hoga ki submit button ko hide hi rakhna hai
 window.skipQuestion = function() {
   if (!skippedQuestions.includes(current)) {
     skippedQuestions.push(current);
@@ -260,6 +266,9 @@ window.skipQuestion = function() {
   if (current < questions.length - 1) { 
     current++; 
     showQuestion(); 
+  } else {
+    // Agar bacha last question pr khada ho kr skip dabaye tab bhi check hoga
+    checkSubmitButtonVisibility();
   }
 };
 
@@ -310,21 +319,22 @@ function submitQuiz() {
     statusColor = parseFloat(finalPercentage) >= 35 ? "green" : "red";
   }
 
+  // ✅ NEW DISCOUNT LOGIC (Sahi answers ki ginti ke aadhar par)
   let discountPercent = "0%";
-  let pNum = parseFloat(finalPercentage);
-
-  if (!statusText.includes("FAIL") && attempted > 0) {
-    if (pNum >= 90 && pNum <= 100) discountPercent = "30%";
-    else if (pNum >= 80 && pNum < 90) discountPercent = "25%";
-    else if (pNum >= 50 && pNum < 80) discountPercent = "20%";
-    else if (pNum >= 35 && pNum < 50) discountPercent = "10%";
+  if (correctCount === 30) {
+    discountPercent = "30%"; 
+  } else if (correctCount >= 25 && correctCount < 30) {
+    discountPercent = "20%"; 
+  } else if (correctCount >= 10 && correctCount < 25) {
+    discountPercent = "10%"; 
+  } else {
+    discountPercent = "0%";  
   }
 
   let studentName = document.getElementById("name").value;
   let studentEmail = document.getElementById("email").value;
   let studentMobile = document.getElementById("mobile").value;
 
-  // Live Link (GitHub) ke liye JSONP format me data send ho raha hai
   const saveResultScript = document.createElement('script');
   const params = new URLSearchParams({
     action: "saveResult",
