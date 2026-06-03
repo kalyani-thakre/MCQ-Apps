@@ -1,5 +1,5 @@
 // ⚠️ IMPORTANT: Aapka Google Script Web App URL
-const API_URL = "https://script.google.com/macros/s/AKfycbxhiv_AFLbGn4douF3CwTezRHx37v0rb0btSZKprvHR91ZsW3cgJ7QVM_sDIZ5z2rqC/exec"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbzvt9rbtjhYq8BWnpU0Wrhs6TJ36LnUIY90hitWX7SR50-6WgSjH3goLcz6wYJ8rTo/exec"; 
 
 let questions = [];
 let current = 0;
@@ -289,7 +289,6 @@ function submitQuiz() {
   }
   
   let correctCount = 0; 
-  let totalScore = 0;   
   let wrong = 0;
   let totalQuestions = questions.length; 
   
@@ -300,8 +299,7 @@ function submitQuiz() {
     
     if (studentAns !== "") {
       if (studentAns === correctAns) {
-        correctCount++;
-        totalScore += q.marks ? Number(q.marks) : 1;
+        correctCount++; // Har sahi question par exact 1 point badhega
       } else {
         wrong++;
       }
@@ -312,7 +310,7 @@ function submitQuiz() {
   
   let attempted = Object.keys(answers).length;
   
-  // Percentage background me calculate hota rahega GSheet ke liye
+  // GSheet ke liye percentage background me chalega
   let actualPercentage = (correctCount / totalQuestions) * 100;
   let finalPercentage = actualPercentage.toFixed(2);
 
@@ -348,11 +346,11 @@ function submitQuiz() {
     name: studentName,
     email: studentEmail,
     mobile: studentMobile,
-    score: totalScore,
+    score: correctCount, // 🔥 GSheet me bhi exact count (19 ya 30) hi score ban kar jayega
     correct: correctCount,
     wrong: wrong,
     attempted: attempted,
-    percentage: finalPercentage + "%", // ✅ GSheet me percentage abhi bhi barabar jayega
+    percentage: finalPercentage + "%", 
     discount: discountPercent,
     status: statusText,
     callback: "handleSaveResponse" 
@@ -377,7 +375,7 @@ function submitQuiz() {
   resultHtml += "<p><b>Attempted :</b> " + attempted + " / " + totalQuestions + "</p>";
   resultHtml += "<p><b>Correct Answers :</b> " + correctCount + "</p>";
   resultHtml += "<p><b>Wrong Answers :</b> " + wrong + "</p>";
-  // 🔥 CHANGED: Ab yahan UI me Raw Percentage ki jagah sirf Sahi Questions ka exact Score dikhega
+  // 🎯 Yahan par sahi sawalon ki sankhya hi bache ka score ban kar dikhegi (30 me se 30 aane par 30 dikhega)
   resultHtml += "<p><b>Total Score :</b> " + correctCount + "</p>";
   resultHtml += "<hr style='border: 0.5px dashed #ccc; margin: 20px auto; width: 80%;'>";
   resultHtml += "<p style='font-size: 24px; margin-top: 15px;'><b>Final Discount :</b><br><b style='color: #083b91; font-size: 44px;'>" + discountPercent + "</b></p>";
