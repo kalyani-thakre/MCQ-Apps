@@ -1,5 +1,5 @@
 // ⚠️ IMPORTANT: Aapka Google Script Web App URL
-const API_URL = "https://script.google.com/macros/s/AKfycbyWIiWEgb6BFmUc4pL2wpoJGl2WXEiRGI0t8fCnalH3u5tPeoQi4dpXgVHkLYVzxWrM/exec"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbyhD2RAaZ7hxLpigFzh9hFwLqg4satQTmMK96Otk_Pgc7yfPZnZuL3RI9at0DjAZ8N_/exec"; 
 
 let questions = [];
 let current = 0;
@@ -279,7 +279,7 @@ window.skipQuestion = function() {
   }
 };
 
-/* ================= 6. SUBMIT QUIZ ================= */
+/* ================= 6. SUBMIT QUIZ - MARKS CALCULATION LOGIC ================= */
 function submitQuiz() {
   if (questions.length === 0) return;
   clearInterval(timerInterval);
@@ -296,8 +296,8 @@ function submitQuiz() {
   
   for (let i = 0; i < totalQuestions; i++) {
     let q = questions[i];
-    let questionWeight = q.marks ? Number(q.marks) : 1;
-    maxPossibleMarks += questionWeight;
+    let questionWeight = q.marks ? Number(q.marks) : 1; 
+    maxPossibleMarks += questionWeight; 
 
     let studentAns = answers[i] ? String(answers[i]).trim().toLowerCase() : "";
     let correctAns = q.answer ? String(q.answer).trim().toLowerCase() : "";
@@ -305,7 +305,7 @@ function submitQuiz() {
     if (studentAns !== "") {
       if (studentAns === correctAns) {
         correctCount++;
-        totalScoreEarned += questionWeight;
+        totalScoreEarned += questionWeight; 
       } else {
         wrong++;
       }
@@ -316,12 +316,10 @@ function submitQuiz() {
   
   let attempted = Object.keys(answers).length;
   let actualPercentage = maxPossibleMarks > 0 ? (totalScoreEarned / maxPossibleMarks) * 100 : 0;
-  let finalPercentage = actualPercentage.toFixed(2);
-
+  
   let statusText = (actualPercentage >= 50) ? "PASS ✅" : "FAIL ❌";
   let statusColor = (actualPercentage >= 50) ? "green" : "red";
 
-  // 🎉 DISCOUNT & MESSAGE LOGIC
   let discountPercent = "0%";
   let customMessage = ""; 
 
@@ -353,7 +351,7 @@ function submitQuiz() {
     correct: correctCount,
     wrong: wrong,
     attempted: attempted,
-    percentage: finalPercentage + "%", 
+    percentage: actualPercentage.toFixed(2) + "%", 
     discount: discountPercent,
     status: statusText,
     callback: "handleSaveResponse" 
@@ -372,18 +370,13 @@ function submitQuiz() {
   let resultHtml = "";
   resultHtml += "<div style='text-align: center; max-width: 450px; margin: 0 auto; padding: 25px; font-family: sans-serif; background: #ffffff; border-radius: 12px;'>";
   resultHtml += "<h2 style='color: #083b91; font-size: 28px; margin-top: 0;'>Exam Result</h2>";
-  resultHtml += "<hr style='border: 1px solid #083b91; margin-bottom: 25px; width: 40%;'>";
   resultHtml += "<div style='font-size: 18px; line-height: 1.8; color: #333;'>";
   resultHtml += "<p><b>Name :</b> " + studentName + "</p>";
-  resultHtml += "<p><b>Attempted :</b> " + attempted + " / " + totalQuestions + "</p>";
-  resultHtml += "<p><b>Correct Answers :</b> " + correctCount + "</p>";
-  resultHtml += "<p><b>Total Score :</b> <span style='color:#083b91; font-weight:bold; font-size:22px;'>" + totalScoreEarned + "</span> / " + maxPossibleMarks + " Marks</p>";
+  resultHtml += "<p style='font-size: 20px;'><b>Total Marks Obtained :</b> <span style='color:#083b91; font-weight:bold;'>" + totalScoreEarned + " / " + maxPossibleMarks + "</span></p>";
   resultHtml += "<hr style='border: 0.5px dashed #ccc; margin: 20px auto; width: 80%;'>";
   resultHtml += "<p style='font-size: 24px; margin-top: 15px;'><b>Final Discount :</b><br><b style='color: #083b91; font-size: 44px;'>" + discountPercent + "</b></p>";
   resultHtml += "<p style='font-size: 22px; margin-top: 15px;'><b>Result Status :</b><br><b style='color: " + statusColor + "; font-size: 30px;'>" + statusText + "</b></p>";
-  
   resultHtml += "<p style='font-size: 16px; color: #444; background: #f4f7fc; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 5px solid #083b91;'>" + customMessage + "</p>";
-  
   resultHtml += "</div></div>";
 
   document.getElementById("result").innerHTML = resultHtml;
