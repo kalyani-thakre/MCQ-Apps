@@ -1,5 +1,5 @@
 // ⚠️ IMPORTANT: Aapka Google Script Web App URL
-const API_URL = "https://script.google.com/macros/s/AKfycbzkMikuHMBlQdYp87yCiCqIDNnvk5ejbFktgHWXRyFjYs7GKYnSzMRzHNg3ErkPkCXQ/exec"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbzNehfMgZy5QzeHFZ3UTvktc6ZECiN02z1BYkmbQPMC4qOxteuAyxsTgnN4tpUud1NG/exec"; 
 
 let questions = [];
 let current = 0;
@@ -174,7 +174,7 @@ function goToQuestion(index) {
   showQuestion(); 
 }
 
-// 👑 FINAL FIX: Jab tak ek ek question (saare 30) solve nahi hote, Submit button 100% chhupa rahega!
+// SUBMIT BUTTON LOGIC: Jab tak saare 31 questions bacha attempt nahi karega, button hidden rahega
 function checkSubmitButtonVisibility() {
   let submitBtn = document.getElementById("submitBtn");
   if (!submitBtn || questions.length === 0) return;
@@ -219,7 +219,7 @@ function showQuestion() {
   }
   
   document.getElementById("quiz").innerHTML = html;
-  checkSubmitButtonVisibility(); // Sawaal load hote hi check karo
+  checkSubmitButtonVisibility();
 }
 
 function saveAnswer() {
@@ -250,7 +250,7 @@ function saveAnswer() {
     }
   }
   
-  checkSubmitButtonVisibility(); // Answer save hote hi check karo
+  checkSubmitButtonVisibility();
 }
 
 function previousQuestion() { 
@@ -264,7 +264,7 @@ function nextQuestion() {
     current++; 
     showQuestion(); 
   } else {
-    checkSubmitButtonVisibility(); // Agar aakhiri question par next dabaye tab bhi check kare
+    checkSubmitButtonVisibility();
   }
 }
 
@@ -276,7 +276,7 @@ window.skipQuestion = function() {
     current++; 
     showQuestion(); 
   } else {
-    checkSubmitButtonVisibility(); // Agar aakhiri question par skip dabaye tab bhi check kare
+    checkSubmitButtonVisibility();
   }
 };
 
@@ -312,31 +312,33 @@ function submitQuiz() {
   }
   
   let attempted = Object.keys(answers).length;
+  
+  // Real percentage calculation
   let actualPercentage = (correctCount / totalQuestions) * 100;
-  let finalPercentage = (actualPercentage * 0.70).toFixed(2);
+  let finalPercentage = actualPercentage.toFixed(2);
 
+  // 🔥 STATUS LOGIC: 15 se kam correct hone par ya 0 questions attempt hone par automatic FAIL dikhega
   let statusText = "";
   let statusColor = "";
 
-  if (attempted === 0) {
+  if (correctCount >= 15 && attempted > 0) {
+    statusText = "PASS ✅";
+    statusColor = "green";
+  } else {
     statusText = "FAIL ❌";
     statusColor = "red";
-    finalPercentage = "0.00"; 
-  } else {
-    statusText = parseFloat(finalPercentage) >= 35 ? "PASS ✅" : "FAIL ❌";
-    statusColor = parseFloat(finalPercentage) >= 35 ? "green" : "red";
   }
 
-  // ✅ NEW DISCOUNT LOGIC (Correct answers ki ginti ke aadhar par)
+  // 🔥 RE-ENGINEERED DISCOUNT LOGIC (Aapke bilkul naye rules ke hisab se)
   let discountPercent = "0%";
-  if (correctCount === 30) {
-    discountPercent = "30%"; 
-  } else if (correctCount >= 25 && correctCount < 30) {
-    discountPercent = "20%"; 
-  } else if (correctCount >= 10 && correctCount < 25) {
-    discountPercent = "10%"; 
+  if (correctCount === totalQuestions) {
+    discountPercent = "30%"; // Pure 31 me se 31 sahi hone par
+  } else if (correctCount >= 25 && correctCount < totalQuestions) {
+    discountPercent = "20%"; // 25 se 30 correct answers hone par
+  } else if (correctCount >= 15 && correctCount < 25) {
+    discountPercent = "10%"; // Exact 15 se 24 correct answers hone par
   } else {
-    discountPercent = "0%";  
+    discountPercent = "0%";  // 15 se kam sahi hone par (jaise 0, 1, 2)
   }
 
   let studentName = document.getElementById("name").value;
@@ -378,7 +380,7 @@ function submitQuiz() {
   resultHtml += "<p><b>Attempted :</b> " + attempted + " / " + totalQuestions + "</p>";
   resultHtml += "<p><b>Correct Answers :</b> " + correctCount + "</p>";
   resultHtml += "<p><b>Wrong Answers :</b> " + wrong + "</p>";
-  resultHtml += "<p><b>Raw Score :</b> " + totalScore + "</p>";
+  resultHtml += "<p><b>Raw Percentage :</b> " + finalPercentage + "%</p>";
   resultHtml += "<hr style='border: 0.5px dashed #ccc; margin: 20px auto; width: 80%;'>";
   resultHtml += "<p style='font-size: 24px; margin-top: 15px;'><b>Final Discount :</b><br><b style='color: #083b91; font-size: 44px;'>" + discountPercent + "</b></p>";
   resultHtml += "<p style='font-size: 22px; margin-top: 15px;'><b>Result Status :</b><br><b style='color: " + statusColor + "; font-size: 30px;'>" + statusText + "</b></p>";
