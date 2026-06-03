@@ -1,5 +1,5 @@
 // ⚠️ IMPORTANT: Aapka Google Script Web App URL
-const API_URL = "https://script.google.com/macros/s/AKfycbzvt9rbtjhYq8BWnpU0Wrhs6TJ36LnUIY90hitWX7SR50-6WgSjH3goLcz6wYJ8rTo/exec"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbx-5UTqa4kyR0IOihe9O33gdiFxtznua2FQzyxEnekKCa2MtsTCRNmB3r4sR-am3kc9/exec"; 
 
 let questions = [];
 let current = 0;
@@ -299,7 +299,7 @@ function submitQuiz() {
     
     if (studentAns !== "") {
       if (studentAns === correctAns) {
-        correctCount++; // Har sahi question par exact 1 point badhega
+        correctCount++;
       } else {
         wrong++;
       }
@@ -310,7 +310,6 @@ function submitQuiz() {
   
   let attempted = Object.keys(answers).length;
   
-  // GSheet ke liye percentage background me chalega
   let actualPercentage = (correctCount / totalQuestions) * 100;
   let finalPercentage = actualPercentage.toFixed(2);
 
@@ -325,15 +324,22 @@ function submitQuiz() {
     statusColor = "red";
   }
 
+  // Score aur Discount ke aadhar par custom message
   let discountPercent = "0%";
+  let customMessage = ""; 
+
   if (correctCount === totalQuestions) {
     discountPercent = "30%"; 
+    customMessage = "🎉 <b>Outstanding!</b> You got a perfect score and successfully unlocked a <b>Special 30% Scholarship Discount</b>!";
   } else if (correctCount >= 25 && correctCount < totalQuestions) {
     discountPercent = "20%"; 
+    customMessage = "🌟 <b>Brilliant Performance!</b> Your hard work earned you a wonderful <b>20% Admission Discount</b>!";
   } else if (correctCount >= 15 && correctCount < 25) {
     discountPercent = "10%"; 
+    customMessage = "👍 <b>Good Job!</b> You passed the exam and successfully unlocked a <b>10% Discount</b>!";
   } else {
     discountPercent = "0%";  
+    customMessage = "✨ <b>Hard Luck!</b> Better luck next time. Practice more to clear the exam and unlock amazing discount benefits.";
   }
 
   let studentName = document.getElementById("name").value;
@@ -346,7 +352,7 @@ function submitQuiz() {
     name: studentName,
     email: studentEmail,
     mobile: studentMobile,
-    score: correctCount, // 🔥 GSheet me bhi exact count (19 ya 30) hi score ban kar jayega
+    score: correctCount, 
     correct: correctCount,
     wrong: wrong,
     attempted: attempted,
@@ -375,11 +381,14 @@ function submitQuiz() {
   resultHtml += "<p><b>Attempted :</b> " + attempted + " / " + totalQuestions + "</p>";
   resultHtml += "<p><b>Correct Answers :</b> " + correctCount + "</p>";
   resultHtml += "<p><b>Wrong Answers :</b> " + wrong + "</p>";
-  // 🎯 Yahan par sahi sawalon ki sankhya hi bache ka score ban kar dikhegi (30 me se 30 aane par 30 dikhega)
   resultHtml += "<p><b>Total Score :</b> " + correctCount + "</p>";
   resultHtml += "<hr style='border: 0.5px dashed #ccc; margin: 20px auto; width: 80%;'>";
   resultHtml += "<p style='font-size: 24px; margin-top: 15px;'><b>Final Discount :</b><br><b style='color: #083b91; font-size: 44px;'>" + discountPercent + "</b></p>";
   resultHtml += "<p style='font-size: 22px; margin-top: 15px;'><b>Result Status :</b><br><b style='color: " + statusColor + "; font-size: 30px;'>" + statusText + "</b></p>";
+  
+  // Naya joda hua informative message section
+  resultHtml += "<p style='font-size: 15px; color: #555; background: #f4f7fc; padding: 12px; border-radius: 8px; margin-top: 20px; line-height: 1.5;'>" + customMessage + "</p>";
+  
   resultHtml += "</div></div>";
 
   document.getElementById("result").innerHTML = resultHtml;
