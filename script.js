@@ -1,6 +1,6 @@
 // ⚠️ IMPORTANT: Aapka Google Script Web App URL
 
-const API_URL = "https://script.google.com/macros/s/AKfycbyC9LPGkXtvH7NiMuWe0S5EPMp-FK9ORzO1V372vzK3Mm4W4tZdW0BP3icNiKl2bSDb/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwwFqi1RE17pVgSVjd8L5-yimL1STutug2Tc4xAvPbbtAZ2bv3Unb2E-e6lAvo96mgm/exec";
 
 
 
