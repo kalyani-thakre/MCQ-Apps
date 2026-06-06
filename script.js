@@ -1,6 +1,6 @@
 // ⚠️ IMPORTANT: Aapka Google Script Web App URL
 
-const API_URL = "https://script.google.com/macros/s/AKfycbweDeSeF8ozzurjAeruBqT_ZLU5qV3yZjkcRDDjTj_M3JV-BbTwm2Vn-kCMof5D8Dso/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbyC9LPGkXtvH7NiMuWe0S5EPMp-FK9ORzO1V372vzK3Mm4W4tZdW0BP3icNiKl2bSDb/exec";
 
 
 
@@ -701,34 +701,22 @@ function submitQuiz() {
 
  
 
+  // Screen par dikhane ke liye
   document.getElementById("result").innerHTML = `
-
     <div style='text-align: center; max-width: 450px; margin: 0 auto; padding: 25px; font-family: sans-serif; background: #ffffff; border-radius: 12px;'>
-
       <h2 style='color: #083b91; font-size: 28px; margin-top: 0;'>Exam Result</h2>
-
       <div style='font-size: 18px; line-height: 1.8; color: #333;'>
-
         <p><b>Name :</b> ${studentName}</p>
-
         <p><b>Attempted :</b> ${attempted} / ${totalQuestions}</p>
-
         <p><b>Correct Answers :</b> ${correctCount}</p>
-
         <p><b>Wrong Answers :</b> ${wrong}</p>
-
         <p style='font-size: 20px;'><b>Total Score :</b> <span style='color:#083b91; font-weight:bold;'>${totalScoreEarned} Marks</span></p>
-
         <hr style='border: 0.5px dashed #ccc; margin: 20px auto; width: 80%;'>
-
+        
         <p style='font-size: 24px;'><b>Final Discount :</b><br><b style='color: #083b91; font-size: 44px;'>${discountPercent}</b></p>
-
+        
         <p style='font-size: 22px;'><b>Result Status :</b><br><b style='color: ${statusColor}; font-size: 30px;'>${statusText}</b></p>
-
         <p style='font-size: 16px; color: #444; background: #f4f7fc; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 5px solid #083b91;'>${customMessage}</p>
-
       </div>
-
     </div>`;
-
 }
