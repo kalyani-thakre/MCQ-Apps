@@ -1,722 +1,448 @@
 // ⚠️ IMPORTANT: Aapka Google Script Web App URL
-
-const API_URL = "https://script.google.com/macros/s/AKfycbwwFqi1RE17pVgSVjd8L5-yimL1STutug2Tc4xAvPbbtAZ2bv3Unb2E-e6lAvo96mgm/exec";
-
-
+const API_URL = "https://script.google.com/macros/s/AKfycbxpo90Mp4nVXPRltTPmSp-U5MZUvvJOr_702TWppKyI0J5n4JH93otBw0ZsVE-j_TY/exec";
 
 let questions = [];
-
 let current = 0;
-
 let answers = {};
-
 let skippedQuestions = [];
 
-
-
 let examKaPakkaTime = 1800;
-
 let timerInterval;
-
 let generatedOTP = null;
 
-
-
 /* ================= 1. DIRECT EMAIL OTP LOGIC ================= */
-
 function sendOTP() {
-
-  let name = document.getElementById("name").value.trim();
-
-  let email = document.getElementById("email").value.trim();
-
-  let mobile = document.getElementById("mobile").value.trim();
-
-  let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-
-
-  if (!name || !emailPattern.test(email) || mobile.length !== 10) {
-
-    alert("Please enter valid Name, Email and 10-digit Mobile Number.");
-
-    return;
-
-  }
-
-
-
-  generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
-
- 
-
-  document.getElementById("sendOtpBtn").innerText = "Sending OTP...";
-
-  document.getElementById("sendOtpBtn").disabled = true;
-
-  document.getElementById("sendOtpBtn").style.opacity = "0.8";
-
-
-
-  const scriptId = "otpScriptTag";
-
-  const oldScript = document.getElementById(scriptId);
-
-  if (oldScript) oldScript.remove();
-
-
-
-  const script = document.createElement('script');
-
-  script.id = scriptId;
-
-  script.src = `${API_URL}?email=${email}&otp=${generatedOTP}&name=${encodeURIComponent(name)}&callback=handleOtpResponse`;
-
- 
-
-  window.otpTimeout = setTimeout(() => {
-
-    alert("❌ OTP Sending Failed! Please check your Google Script Authorization or URL.");
-
-    resetOTPButton();
-
-  }, 8000);
-
-
-
-  document.body.appendChild(script);
-
-}
-
-
-
-window.handleOtpResponse = function(response) {
-
-  clearTimeout(window.otpTimeout);
-
-  if (response && response.status === "SUCCESS") {
-
-    document.getElementById("otpContainer").style.display = "block";
-
-    document.getElementById("verifyOtpBtn").style.display = "block";
-
-    document.getElementById("sendOtpBtn").style.display = "none";
-
-  } else {
-
-    alert("❌ OTP Sending Failed: " + (response.message || "Unknown Error"));
-
-    resetOTPButton();
-
-  }
-
-};
-
-
-
-function resetOTPButton() {
-
-  document.getElementById("sendOtpBtn").innerText = "Send OTP to Email";
-
-  document.getElementById("sendOtpBtn").disabled = false;
-
-  document.getElementById("sendOtpBtn").style.opacity = "1";
-
-  document.getElementById("otpContainer").style.display = "none";
-
-  document.getElementById("verifyOtpBtn").style.display = "none";
-
-}
-
-
-
-/* ================= 2. VERIFY OTP FUNCTION ================= */
-
-function verifyOTP() {
-
-  let userOTP = document.getElementById("otpInput").value.trim();
-
-  let verifyBtn = document.getElementById("verifyOtpBtn");
-
-
-
-  if (userOTP === "") {
-
-    alert("Please enter the OTP");
-
-    return;
-
-  }
-
-
-
-  if (userOTP === generatedOTP) {
-
-    verifyBtn.innerText = "Verifying...";
-
-    verifyBtn.disabled = true;
-
-    verifyBtn.style.opacity = "0.8";
-
-
-
-    setTimeout(() => {
-
-      startQuiz();
-
-    }, 1000);
-
-  } else {
-
-    alert("❌ Invalid OTP! Please enter correct OTP.");
-
-  }
-
-}
-
-
-
-/* ================= 3. START QUIZ ================= */
-
-function startQuiz() {
-
-  document.getElementById("page1").style.display = "none";
-
-  document.getElementById("page2").style.display = "block";
-
-  document.getElementById("quiz").innerHTML = `<h2>Loading Question...</h2>`;
-
-
-
-  let verifyBtn = document.getElementById("verifyOtpBtn");
-
-  if(verifyBtn) {
-
-    verifyBtn.innerText = "Verify OTP & Start Exam";
-
-    verifyBtn.disabled = false;
-
-    verifyBtn.style.opacity = "1";
-
-  }
-
-
-
-  const scriptId = "questionsScriptTag";
-
-  const oldScript = document.getElementById(scriptId);
-
-  if (oldScript) oldScript.remove();
-
-
-
-  const script = document.createElement('script');
-
-  script.id = scriptId;
-
-  script.src = `${API_URL}?callback=handleQuestionsResponse`;
-
-  document.body.appendChild(script);
-
-}
-
-
-
-window.handleQuestionsResponse = function(data) {
-
-  questions = data.filter(q => q && q.question && String(q.question).trim() !== "");
-
-  current = 0;
-
-  if (questions.length > 0) {
-
-    renderQuestionNumbers();
-
-    showQuestion();
-
-    startTimer();
-
-  } else {
-
-    alert("Google Sheet me koi question nahi mila!");
-
-  }
-
-};
-
-
-
-/* ================= 4. TIMER LOGIC ================= */
-
-function startTimer() {
-
-  clearInterval(timerInterval);
-
-  examKaPakkaTime = 1800;
-
-  updateTimerDisplay();
-
-
-
-  timerInterval = setInterval(() => {
-
-    if (examKaPakkaTime <= 0) {
-
-      clearInterval(timerInterval);
-
-      submitQuiz();
-
-      return;
-
+    let name = document.getElementById("name").value.trim();
+    let email = document.getElementById("email").value.trim();
+    let mobile = document.getElementById("mobile").value.trim();
+    let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!name || !emailPattern.test(email) || mobile.length !== 10) {
+        alert("Please enter valid Name, Email and 10-digit Mobile Number.");
+        return;
     }
 
-    examKaPakkaTime--;
+    generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
+
+    document.getElementById("sendOtpBtn").innerText = "Sending OTP...";
+    document.getElementById("sendOtpBtn").disabled = true;
+    document.getElementById("sendOtpBtn").style.opacity = "0.8";
+
+    const scriptId = "otpScriptTag";
+    const oldScript = document.getElementById(scriptId);
+    if (oldScript) oldScript.remove();
+
+    const script = document.createElement('script');
+    script.id = scriptId;
+    script.src = `${API_URL}?email=${email}&otp=${generatedOTP}&name=${encodeURIComponent(name)}&callback=handleOtpResponse`;
+
+    window.otpTimeout = setTimeout(() => {
+        alert("❌ OTP Sending Failed! Please check your Google Script Authorization or URL.");
+        resetOTPButton();
+    }, 8000);
+
+    document.body.appendChild(script);
+}
+
+window.handleOtpResponse = function(response) {
+    clearTimeout(window.otpTimeout);
+    if (response && response.status === "SUCCESS") {
+        document.getElementById("otpContainer").style.display = "block";
+        document.getElementById("verifyOtpBtn").style.display = "block";
+        document.getElementById("sendOtpBtn").style.display = "none";
+    } else {
+        alert("❌ OTP Sending Failed: " + (response.message || "Unknown Error"));
+        resetOTPButton();
+    }
+};
+
+function resetOTPButton() {
+    document.getElementById("sendOtpBtn").innerText = "Send OTP to Email";
+    document.getElementById("sendOtpBtn").disabled = false;
+    document.getElementById("sendOtpBtn").style.opacity = "1";
+    document.getElementById("otpContainer").style.display = "none";
+    document.getElementById("verifyOtpBtn").style.display = "none";
+}
+
+/* ================= 2. VERIFY OTP FUNCTION ================= */
+function verifyOTP() {
+    let userOTP = document.getElementById("otpInput").value.trim();
+    let verifyBtn = document.getElementById("verifyOtpBtn");
+
+    if (userOTP === "") {
+        alert("Please enter the OTP");
+        return;
+    }
+
+    if (userOTP === generatedOTP) {
+        verifyBtn.innerText = "Verifying...";
+        verifyBtn.disabled = true;
+        verifyBtn.style.opacity = "0.8";
+
+        setTimeout(() => {
+            startQuiz();
+        }, 1000);
+    } else {
+        alert("❌ Invalid OTP! Please enter correct OTP.");
+    }
+}
+
+function startQuiz() {
+  var courseId = document.getElementById("courseSelect").value;
+  document.getElementById("page1").style.display = "none";
+  document.getElementById("page2").style.display = "block";
+  document.getElementById("quiz").innerHTML = "loading...";
+
+  fetch(API_URL + "?course=" + courseId)
+  .then(response => response.json())
+  .then(data => {
+
+      questions = data.questions || [];
+
+      examKaPakkaTime = data.duration || 1800;
+
+      if (questions.length > 0) {
+        current = 0;
+        renderQuestionNumbers();
+        showQuestion();
+        startTimer();
+      } else {
+        document.getElementById("quiz").innerHTML =
+        "Is course ke liye questions nahi mile.";
+      }
+  })
+}
+window.handleQuestionsResponse = function(data) {
+    questions = data.filter(q => q && q.question && String(q.question).trim() !== "");
+    current = 0;
+    if (questions.length > 0) {
+        renderQuestionNumbers();
+        showQuestion();
+        startTimer();
+    } else {
+        alert("Google Sheet me koi question nahi mila!");
+    }
+};
+
+function startTimer() {
+    clearInterval(timerInterval);
 
     updateTimerDisplay();
 
-  }, 1000);
+    timerInterval = setInterval(() => {
+        if (examKaPakkaTime <= 0) {
+            clearInterval(timerInterval);
+            submitQuiz();
+            return;
+        }
 
+        examKaPakkaTime--;
+        updateTimerDisplay();
+
+    }, 1000);
 }
-
-
 
 function updateTimerDisplay() {
-
-  let min = Math.floor(examKaPakkaTime / 60);
-
-  let sec = examKaPakkaTime % 60;
-
-  let timerElement = document.getElementById("timer");
-
-  if (timerElement) {
-
-    timerElement.innerHTML = `${min < 10 ? "0"+min : min}:${sec < 10 ? "0"+sec : sec}`;
-
-  }
-
+    let min = Math.floor(examKaPakkaTime / 60);
+    let sec = examKaPakkaTime % 60;
+    let timerElement = document.getElementById("timer");
+    if (timerElement) {
+        timerElement.innerHTML = `${min < 10 ? "0"+min : min}:${sec < 10 ? "0"+sec : sec}`;
+    }
 }
-
-
 
 /* ================= 5. EXAM GRID & DISPLAY ================= */
-
 function renderQuestionNumbers() {
-
-  let html = "";
-
-  questions.forEach((q, i) => {
-
-    html += `<div class="qnum" id="num${i}" onclick="goToQuestion(${i})">${i+1}</div>`;
-
-  });
-
-  document.getElementById("questionNumbers").innerHTML = html;
-
+    let html = "";
+    questions.forEach((q, i) => {
+        html += `<div class="qnum" id="num${i}" onclick="goToQuestion(${i})">${i+1}</div>`;
+    });
+    document.getElementById("questionNumbers").innerHTML = html;
 }
-
 
 function updateQuestionColors() {
-  questions.forEach((q, i) => {
-    let box = document.getElementById(`num${i}`);
-    if (!box) return;
+    questions.forEach((q, i) => {
+        let box = document.getElementById(`num${i}`);
+        if (!box) return;
 
-    // Purani sabhi styling classes hata dein
-    box.classList.remove("current", "answered", "skipped");
+        box.classList.remove("current", "answered", "skipped");
 
-    // Nayi sahi styling class lagayein
-    if (i === current) {
-      box.classList.add("current");
-    } else if (answers[i] !== undefined && answers[i] !== null && answers[i] !== "") {
-      box.classList.add("answered");
-    } else if (skippedQuestions.includes(i)) {
-      box.classList.add("skipped");
-    }
-  });
+        if (i === current) {
+            box.classList.add("current");
+        } else if (answers[i] !== undefined && answers[i] !== null && answers[i] !== "") {
+            box.classList.add("answered");
+        } else if (skippedQuestions.includes(i)) {
+            box.classList.add("skipped");
+        }
+    });
 }
-
 
 function goToQuestion(index) {
-
-  saveAnswer();
-
-  current = index;
-
-  showQuestion();
-
+    saveAnswer();
+    current = index;
+    showQuestion();
 }
-
-
 
 function checkSubmitButtonVisibility() {
+    let submitBtn = document.getElementById("submitBtn");
+    if (!submitBtn || questions.length === 0) return;
 
-  let submitBtn = document.getElementById("submitBtn");
+    let totalAnswered = Object.keys(answers).length;
 
-  if (!submitBtn || questions.length === 0) return;
-
-
-
-  let totalAnswered = Object.keys(answers).length;
-
-
-
-  if (totalAnswered === questions.length) {
-
-    submitBtn.style.setProperty('display', 'block', 'important');
-
-  } else {
-
-    submitBtn.style.setProperty('display', 'none', 'important');
-
-  }
-
+    if (totalAnswered === questions.length) {
+        submitBtn.style.setProperty('display', 'block', 'important');
+    } else {
+        submitBtn.style.setProperty('display', 'none', 'important');
+    }
 }
-
-
 
 function showQuestion() {
+    if (questions.length === 0) return;
+    if (current >= questions.length) { current = questions.length - 1; }
 
-  if (questions.length === 0) return;
+    updateQuestionColors();
+    let q = questions[current];
+    document.getElementById("qcount").innerHTML = `Question ${current+1} / ${questions.length}`;
+    let html = `<div class="question">${q.question}</div>`;
 
-  if (current >= questions.length) { current = questions.length - 1; }
+    let validOptions = [];
+    if (q.options && Array.isArray(q.options)) {
+        validOptions = q.options.filter(opt => opt && String(opt).trim() !== "" && String(opt).trim() !== "undefined" && String(opt).trim() !== "null");
+    }
 
- 
+    if (validOptions.length === 0) {
+        let savedText = answers[current] ? answers[current] : "";
+        html += `<div class="type-container" style="margin-top:15px;">
+                    <input type="text" id="typedAnswer" class="option" style="width:100%; padding:12px; font-size:16px; border:1px solid #ccc; border-radius:4px;" placeholder="Type your answer here..." value="${savedText}" oninput="saveAnswer()">
+                 </div>`;
+    } else {
+        validOptions.forEach(opt => {
+            let checked = answers[current] == opt ? "checked" : "";
+            html += `<label class="option"><input type="radio" name="option" value="${opt}" ${checked} onchange="saveAnswer()"> ${opt}</label>`;
+        });
+    }
 
-  updateQuestionColors();
-
-  let q = questions[current];
-
-  document.getElementById("qcount").innerHTML = `Question ${current+1} / ${questions.length}`;
-
-  let html = `<div class="question">${q.question}</div>`;
-
- 
-
-  let validOptions = [];
-
-  if (q.options && Array.isArray(q.options)) {
-
-    validOptions = q.options.filter(opt => opt && String(opt).trim() !== "" && String(opt).trim() !== "undefined" && String(opt).trim() !== "null");
-
-  }
-
-
-
-  if (validOptions.length === 0) {
-
-    let savedText = answers[current] ? answers[current] : "";
-
-    html += `<div class="type-container" style="margin-top:15px;">
-
-              <input type="text" id="typedAnswer" class="option" style="width:100%; padding:12px; font-size:16px; border:1px solid #ccc; border-radius:4px;" placeholder="Type your answer here..." value="${savedText}" oninput="saveAnswer()">
-
-             </div>`;
-
-  } else {
-
-    validOptions.forEach(opt => {
-
-      let checked = answers[current] === opt ? "checked" : "";
-
-      html += `<label class="option"><input type="radio" name="option" value="${opt}" ${checked} onchange="saveAnswer()"> ${opt}</label>`;
-
-    });
-
-  }
-
- 
-
-  document.getElementById("quiz").innerHTML = html;
-
-  checkSubmitButtonVisibility();
-
+    document.getElementById("quiz").innerHTML = html;
+    checkSubmitButtonVisibility();
 }
-
-
 
 function saveAnswer() {
+    if (questions.length === 0 || !questions[current]) return;
+    let q = questions[current];
+    let validOptions = [];
+    if (q.options && Array.isArray(q.options)) {
+        validOptions = q.options.filter(opt => opt && String(opt).trim() !== "" && String(opt).trim() !== "undefined" && String(opt).trim() !== "null");
+    }
 
-  if (questions.length === 0 || !questions[current]) return;
-
-  let q = questions[current];
-
-  let validOptions = [];
-
-  if (q.options && Array.isArray(q.options)) {
-
-    validOptions = q.options.filter(opt => opt && String(opt).trim() !== "" && String(opt).trim() !== "undefined" && String(opt).trim() !== "null");
-
-  }
-
- 
-
-  if (validOptions.length === 0) {
-
-    let typedVal = document.getElementById("typedAnswer") ? document.getElementById("typedAnswer").value.trim() : "";
-
-    if (typedVal !== "") {
-
-      answers[current] = typedVal;
-
-      let box = document.getElementById(`num${current}`);
-
-      if (box) box.classList.add("answered");
-
+    if (validOptions.length === 0) {
+        let typedVal = document.getElementById("typedAnswer") ? document.getElementById("typedAnswer").value.trim() : "";
+        if (typedVal !== "") {
+            answers[current] = typedVal;
+            let box = document.getElementById(`num${current}`);
+            if (box) box.classList.add("answered");
+        } else {
+            delete answers[current];
+            let box = document.getElementById(`num${current}`);
+            if (box) box.classList.remove("answered");
+        }
     } else {
-
-      delete answers[current];
-
-      let box = document.getElementById(`num${current}`);
-
-      if (box) box.classList.remove("answered");
-
+        let selected = document.querySelector('input[name="option"]:checked');
+        if (selected) {
+            answers[current] = selected.value;
+            let boxReal = document.getElementById(`num${current}`);
+            if (boxReal) boxReal.classList.add("answered");
+        }
     }
-
-  } else {
-
-    let selected = document.querySelector('input[name="option"]:checked');
-
-    if (selected) {
-
-      answers[current] = selected.value;
-
-      let boxReal = document.getElementById(`num${current}`);
-
-      if (boxReal) boxReal.classList.add("answered");
-
-    }
-
-  }
-
- 
-
-  checkSubmitButtonVisibility();
-
+    checkSubmitButtonVisibility();
 }
-
-
 
 function previousQuestion() {
-
-  saveAnswer();
-
-  if (current > 0) { current--; showQuestion(); }
-
+    saveAnswer();
+    if (current > 0) { current--; showQuestion(); }
 }
-
-
 
 function nextQuestion() {
-
-  saveAnswer();
-
-  if (current < questions.length - 1) {
-
-    current++;
-
-    showQuestion();
-
-  } else {
-
-    checkSubmitButtonVisibility();
-
-  }
-
+    saveAnswer();
+    if (current < questions.length - 1) {
+        current++;
+        showQuestion();
+    } else {
+        checkSubmitButtonVisibility();
+    }
 }
 
-
-
-// YAHAN SKIP BUTTON KA LOGIC UPDATE HUA HAI (ANSWER UNSAVE HOGA)
-
 window.skipQuestion = function() {
-
-  delete answers[current]; // Answer unsave ho jayega
-
-  if (!skippedQuestions.includes(current)) {
-
-    skippedQuestions.push(current);
-
-  }
-
-  if (current < questions.length - 1) {
-
-    current++;
-
-    showQuestion();
-
-  } else {
-
-    checkSubmitButtonVisibility();
-
-  }
-
-  updateQuestionColors();
-
+    delete answers[current];
+    if (!skippedQuestions.includes(current)) {
+        skippedQuestions.push(current);
+    }
+    if (current < questions.length - 1) {
+        current++;
+        showQuestion();
+    } else {
+        checkSubmitButtonVisibility();
+    }
+    updateQuestionColors();
 };
 
-
-
 /* ================= 6. SUBMIT QUIZ ================= */
-
 function submitQuiz() {
+    if (questions.length === 0) return;
+    clearInterval(timerInterval);
 
-  if (questions.length === 0) return;
-
-  clearInterval(timerInterval);
-
- 
-
-  if (document.getElementById("typedAnswer")) {
-
-    saveAnswer();
-
-  }
-
- 
-
-  let totalScoreEarned = 0;
-
-  let maxPossibleMarks = 0;
-
-  let correctCount = 0;
-
-  let wrong = 0;
-
-  let totalQuestions = questions.length;
-
- 
-
-  for (let i = 0; i < totalQuestions; i++) {
-
-    let q = questions[i];
-
-    let questionWeight = q.marks ? Number(q.marks) : 1;
-
-    maxPossibleMarks += questionWeight;
-
-
-
-    let studentAns = answers[i] ? String(answers[i]).trim().toLowerCase() : "";
-
-    let correctAns = q.answer ? String(q.answer).trim().toLowerCase() : "";
-
-   
-
-    if (studentAns !== "") {
-
-      if (studentAns === correctAns) {
-
-        correctCount++;
-
-        totalScoreEarned += questionWeight;
-
-      } else {
-
-        wrong++;
-
-      }
-
-    } else {
-
-      wrong++;
-
+    if (document.getElementById("typedAnswer")) {
+        saveAnswer();
     }
 
-  }
+    let totalScoreEarned = 0;
+    let maxPossibleMarks = 0;
+    let correctCount = 0;
+    let wrong = 0;
+    let totalQuestions = questions.length;
 
- 
+    for (let i = 0; i < totalQuestions; i++) {
+        let q = questions[i];
+        let questionWeight = q.marks ? Number(q.marks) : 1;
+        maxPossibleMarks += questionWeight;
 
-  let attempted = Object.keys(answers).length;
+        let studentAns = answers[i] ? String(answers[i]).trim().toLowerCase() : "";
+        let correctAns = q.answer ? String(q.answer).trim().toLowerCase() : "";
 
-  let actualPercentage = maxPossibleMarks > 0 ? (totalScoreEarned / maxPossibleMarks) * 100 : 0;
+        if (studentAns !== "") {
+            if (studentAns === correctAns) {
+                correctCount++;
+                totalScoreEarned += questionWeight;
+            } else {
+                wrong++;
+            }
+        } else {
+            wrong++;
+        }
+    }
 
- 
+    let attempted = Object.keys(answers).length;
+    let actualPercentage = maxPossibleMarks > 0 ? (totalScoreEarned / maxPossibleMarks) * 100 : 0;
 
-  let statusText = (actualPercentage >= 50) ? "PASS ✅" : "FAIL ❌";
+    let statusText = (actualPercentage >= 50) ? "PASS ✅" : "FAIL ❌";
+    let statusColor = (actualPercentage >= 50) ? "green" : "red";
+    let industrialDiscount = Math.round((correctCount / totalQuestions) * 5000);
+    let certificateDiscount = Math.round((correctCount / totalQuestions) * 2500);
+    let foundationDiscount = Math.round((correctCount / totalQuestions) * 750);
+    let customMessage = (actualPercentage >= 50) ? "🎉 Congratulations! You have unlocked your scholarship discount." : "✨ Hard Luck! Please try again to clear the exam.";
 
-  let statusColor = (actualPercentage >= 50) ? "green" : "red";
+    let studentName = document.getElementById("name").value;
+    let studentEmail = document.getElementById("email").value;
+    let studentMobile = document.getElementById("mobile").value;
 
-  let discountPercent = (actualPercentage >= 50) ? (actualPercentage >= 100 ? "30%" : (actualPercentage >= 80 ? "20%" : "10%")) : "0%";
+    const saveResultScript = document.createElement('script');
+    const params = new URLSearchParams({
+        action: "saveResult",
+        name: studentName,
+        email: studentEmail,
+        mobile: studentMobile,
+        score: totalScoreEarned,
+        correct: correctCount,
+        wrong: wrong,
+        attempted: attempted,
+        percentage: actualPercentage.toFixed(2) + "%",
+        discount: "",
+        status: statusText,
+        callback: "handleSaveResponse"
+    });
 
-  let customMessage = (actualPercentage >= 50) ? "🎉 Congratulations! You have unlocked your scholarship discount." : "✨ Hard Luck! Please try again to clear the exam.";
+    saveResultScript.src = `${API_URL}?${params.toString()}`;
+    document.body.appendChild(saveResultScript);
 
+    window.handleSaveResponse = function(response) {
+        console.log("Data successfully received in sheet:", response);
+    };
 
+    document.getElementById("page2").style.display = "none";
+    document.getElementById("page3").style.display = "block";
 
-  let studentName = document.getElementById("name").value;
+    document.getElementById("result").innerHTML = `
+<div class="result-card">
 
-  let studentEmail = document.getElementById("email").value;
+  <h2 class="result-title">Exam Result</h2>
 
-  let studentMobile = document.getElementById("mobile").value;
+  <p style="font-size:18px; font-weight:bold;">
+    Name: ${studentName}
+  </p>
 
+  <div class="result-simple">
 
+    <p><b>Attempted:</b> ${attempted}</p>
+    <p><b>Correct:</b> ${correctCount}</p>
+    <p><b>Wrong:</b> ${wrong}</p>
+    <p><b>Total Score:</b> ${totalScoreEarned}</p>
 
-  const saveResultScript = document.createElement('script');
+  </div>
 
-  const params = new URLSearchParams({
+  <div class="course-container">
 
-    action: "saveResult",
+  <div class="course-box">
+    <div class="course-name">Industrial Course</div>
+   <div class="course-price">₹${industrialDiscount}</div>
+  </div>
 
-    name: studentName,
+  <div class="course-box">
+    <div class="course-name">Certificate Course</div>
+   <div class="course-price">₹${certificateDiscount}</div>
+  </div>
 
-    email: studentEmail,
+  <div class="course-box">
+    <div class="course-name">Foundation Course</div>
+    <div class="course-price">₹${foundationDiscount}</div>
+  </div>
 
-    mobile: studentMobile,
+</div>
 
-    score: totalScoreEarned,
+  <div class="status-box">
+    <div class="status-title">Result Status</div>
+    <div class="status-value" style="color:${statusColor}">
+      ${statusText}
+    </div>
+  </div>
 
-    correct: correctCount,
+  <div class="message-box">
+    ${customMessage}
+  </div>
 
-    wrong: wrong,
+  <div class="certificate-card">
+  <div class="certificate-row">
 
-    attempted: attempted,
+    <div class="certificate-left">
 
-    percentage: actualPercentage.toFixed(2) + "%",
+      <img src="logo.png" style="width: 350px; margin-bottom:25px;">
 
-    discount: discountPercent,
+      <h1 style="text-align:left;">CERTIFICATE OF COMPLETION</h1>
 
-    status: statusText,
+      <p style="text-align:left;">This certificate is awarded to</p>
 
-    callback: "handleSaveResponse"
+      <h2 class="student-name" style="text-align:left;">${studentName}</h2>
 
-  });
+      <p style="text-align:left;">Who has successfully completed</p>
 
- 
+      <h3 class="course-name-cert" style="text-align:left;">
+      ${document.getElementById("courseSelect").options[document.getElementById("courseSelect").selectedIndex].text}
+      </h3>
 
-  saveResultScript.src = `${API_URL}?${params.toString()}`;
+      <p style="text-align:left;">
+      Fullfilling All the requirements stipulated by Asterisc to achieve professional excellence.
+      </p>
 
-  document.body.appendChild(saveResultScript);
+      <p style="text-align:left;">
+      Issued Date: ${new Date().toLocaleDateString()}
+      </p>
 
+    </div>
 
+    <div class="certificate-right">
+     <img src="seal.png" class="seal-img">
+      <img src="director-panel.png" class="director-img">
+    </div>
 
-  window.handleSaveResponse = function(response) {
-
-    console.log("Data successfully received in sheet:", response);
-
-  };
-
-
-
-  document.getElementById("page2").style.display = "none";
-
-  document.getElementById("page3").style.display = "block";
-
- 
-
-  // Screen par dikhane ke liye
-  document.getElementById("result").innerHTML = `
-    <div style='text-align: center; max-width: 450px; margin: 0 auto; padding: 25px; font-family: sans-serif; background: #ffffff; border-radius: 12px;'>
-      <h2 style='color: #083b91; font-size: 28px; margin-top: 0;'>Exam Result</h2>
-      <div style='font-size: 18px; line-height: 1.8; color: #333;'>
-        <p><b>Name :</b> ${studentName}</p>
-        <p><b>Attempted :</b> ${attempted} / ${totalQuestions}</p>
-        <p><b>Correct Answers :</b> ${correctCount}</p>
-        <p><b>Wrong Answers :</b> ${wrong}</p>
-        <p style='font-size: 20px;'><b>Total Score :</b> <span style='color:#083b91; font-weight:bold;'>${totalScoreEarned} Marks</span></p>
-        <hr style='border: 0.5px dashed #ccc; margin: 20px auto; width: 80%;'>
-        
-        <p style='font-size: 24px;'><b>Final Discount :</b><br><b style='color: #083b91; font-size: 44px;'>${discountPercent}</b></p>
-        
-        <p style='font-size: 22px;'><b>Result Status :</b><br><b style='color: ${statusColor}; font-size: 30px;'>${statusText}</b></p>
-        <p style='font-size: 16px; color: #444; background: #f4f7fc; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 5px solid #083b91;'>${customMessage}</p>
-      </div>
-    </div>`;
+  </div>
+</div>
+`;
 }
