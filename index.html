@@ -1,11 +1,32 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Codeline.AI</title>
   <link rel="stylesheet" href="style.css">
+
+  <style>
+    .center-loader {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 60px;
+      height: 60px;
+      margin: -30px 0 0 -30px;
+      border: 6px solid #ddd;
+      border-top: 6px solid #3498db;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
 </head>
+
 <body>
 
 <div class="container">
@@ -16,6 +37,12 @@
       <input type="text" id="name" placeholder="Enter Name">
       <input type="email" id="email" placeholder="Enter Email">
       <input type="text" id="mobile" placeholder="Enter Mobile Number">
+
+      <select id="courseSelect" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px;">
+        <option value="">-- Select Course --</option>
+        <option value="c1">C Programming</option>
+        <option value="c2">Python</option>
+      </select>
     </div>
 
     <button class="start-btn" id="sendOtpBtn" onclick="sendOTP()">
@@ -24,20 +51,30 @@
 
     <div id="otpContainer" style="display:none;">
       <input type="text" id="otpInput" placeholder="OTP" maxlength="4">
-      
+
       <button class="start-btn" id="verifyOtpBtn" onclick="verifyOTP()">
         Verify OTP & Start Exam
       </button>
     </div>
   </div>
 
-  <div id="page2" style="display:none;">
-    <div id="timer">02:00</div>
+  <div id="page2" style="display:none; position:relative;">
+
+    <div id="loader" style="display:none;">
+      <div class="center-loader"></div>
+    </div>
 
     <div class="exam-layout">
       <div class="left-panel">
-        <div class="top-bar">
-          <div id="qcount">Question 1 / 80</div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; margin-bottom: 20px;">
+          <div id="qcount" style="font-size: 20px; font-weight: bold; color: #333;">
+            Question 1 / 80
+          </div>
+
+          <div id="timer" style="font-size: 28px !important; font-weight: bold !important; color: #000000 !important;">
+            30:00
+          </div>
         </div>
 
         <div id="quiz"></div>
@@ -49,24 +86,28 @@
         </div>
 
         <div style="margin-top:15px;">
-          <button class="submit-btn" id="submitBtn" onclick="submitQuiz()" style="width:100%; padding:16px; border-radius:10px; font-size:20px;">
+          <button class="submit-btn" id="submitBtn" onclick="submitQuiz()" style="display:none;">
             Submit
           </button>
         </div>
+
       </div>
 
       <div class="right-panel">
         <h3>Questions</h3>
         <div id="questionNumbers" class="question-grid"></div>
       </div>
+
     </div>
   </div>
 
   <div id="page3" style="display:none;">
     <div id="result"></div>
   </div>
+
 </div>
 
-<script src="script.js"></script>
+<script src="script.js?v=1.1"></script>
+
 </body>
 </html>
