@@ -380,22 +380,22 @@ function submitQuiz() {
 
   <div class="course-container">
 
-  <div class="course-box">
-    <div class="course-name">Industrial Course</div>
-   <div class="course-price">₹${industrialDiscount}</div>
-  </div>
+    <div class="course-box">
+      <div class="course-name">Industrial Course</div>
+      <div class="course-price">₹${industrialDiscount}</div>
+    </div>
 
-  <div class="course-box">
-    <div class="course-name">Certificate Course</div>
-   <div class="course-price">₹${certificateDiscount}</div>
-  </div>
+    <div class="course-box">
+      <div class="course-name">Certificate Course</div>
+      <div class="course-price">₹${certificateDiscount}</div>
+    </div>
 
-  <div class="course-box">
-    <div class="course-name">Foundation Course</div>
-    <div class="course-price">₹${foundationDiscount}</div>
-  </div>
+    <div class="course-box">
+      <div class="course-name">Foundation Course</div>
+      <div class="course-price">₹${foundationDiscount}</div>
+    </div>
 
-</div>
+  </div>
 
   <div class="status-box">
     <div class="status-title">Result Status</div>
@@ -409,40 +409,66 @@ function submitQuiz() {
   </div>
 
   <div class="certificate-card">
-  <div class="certificate-row">
+    <div class="certificate-row">
 
-    <div class="certificate-left">
+      <div class="certificate-left">
 
-      <img src="logo.png" style="width: 350px; margin-bottom:25px;">
+        <img src="logo.png" style="width: 350px; margin-bottom:25px;">
 
-      <h1 style="text-align:left;">CERTIFICATE OF COMPLETION</h1>
+        <h1 style="text-align:left;">CERTIFICATE OF COMPLETION</h1>
 
-      <p style="text-align:left;">This certificate is awarded to</p>
+        <p style="text-align:left;">This certificate is awarded to</p>
 
-      <h2 class="student-name" style="text-align:left;">${studentName}</h2>
+        <h2 class="student-name" style="text-align:left;">${studentName}</h2>
 
-      <p style="text-align:left;">Who has successfully completed</p>
+        <p style="text-align:left;">Who has successfully completed</p>
 
-      <h3 class="course-name-cert" style="text-align:left;">
-      ${document.getElementById("courseSelect").options[document.getElementById("courseSelect").selectedIndex].text}
-      </h3>
+        <h3 class="course-name-cert" style="text-align:left;">
+          ${document.getElementById("courseSelect").options[document.getElementById("courseSelect").selectedIndex].text}
+        </h3>
 
-      <p style="text-align:left;">
-      Fullfilling All the requirements stipulated by Asterisc to achieve professional excellence.
-      </p>
+        <p style="text-align:left;">
+          Fullfilling All the requirements stipulated by Asterisc to achieve professional excellence.
+        </p>
 
-      <p style="text-align:left;">
-      Issued Date: ${new Date().toLocaleDateString()}
-      </p>
+        <p style="text-align:left;">
+          Issued Date: ${new Date().toLocaleDateString()}
+        </p>
+
+      </div>
+
+      <div class="certificate-right">
+        <img src="seal.png" class="seal-img">
+        <img src="director-panel.png" class="director-img">
+      </div>
 
     </div>
-
-    <div class="certificate-right">
-     <img src="seal.png" class="seal-img">
-      <img src="director-panel.png" class="director-img">
-    </div>
-
   </div>
+
+  <br><br>
+
+  <button onclick="downloadCertificate()" class="start-btn">
+    Download Certificate PDF
+  </button>
+
 </div>
 `;
+}
+function downloadCertificate() {
+    const element = document.querySelector(".certificate-card");
+
+    html2pdf()
+        .set({
+            margin: 10,
+            filename: 'Certificate.pdf',
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { scale: 2 },
+            jsPDF: {
+                unit: 'mm',
+                format: 'a4',
+                orientation: 'landscape'
+            }
+        })
+        .from(element)
+        .save();
 }
