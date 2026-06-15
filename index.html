@@ -33,7 +33,6 @@
   <h1>Codeline.AI</h1>
 
   <div id="page1">
-
     <div class="user-details">
       <input type="text" id="name" placeholder="Enter Name">
       <input type="email" id="email" placeholder="Enter Email">
@@ -46,11 +45,17 @@
       </select>
     </div>
 
-    <!-- ✅ OTP REMOVED - ONLY START EXAM -->
-    <button class="start-btn" onclick="startQuiz()">
-      Start Exam
+    <button class="start-btn" id="sendOtpBtn" onclick="sendOTP()">
+      Send OTP to Email
     </button>
 
+    <div id="otpContainer" style="display:none;">
+      <input type="text" id="otpInput" placeholder="OTP" maxlength="4">
+
+      <button class="start-btn" id="verifyOtpBtn" onclick="verifyOTP()">
+        Verify OTP & Start Exam
+      </button>
+    </div>
   </div>
 
   <div id="page2" style="display:none; position:relative;">
@@ -60,7 +65,6 @@
     </div>
 
     <div class="exam-layout">
-
       <div class="left-panel">
 
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; margin-bottom: 20px;">
