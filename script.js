@@ -1,5 +1,5 @@
 // ⚠️ IMPORTANT: Aapka Google Script Web App URL
-const API_URL = "https://script.google.com/macros/s/AKfycbxcQSDeAZcLmDNTiJprBmlnXgIIMetIrB57fW0t-f5Xap9FUNLVMKoaK5Pa--l0h_EF/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzvHwUMdxSDlLaPkujUcdD-ORmD55gzJz-dHuuvoU3f83WuhIg3i97ANh6RQ-f1mX8t/exec";
 
 let questions = [];
 let current = 0;
@@ -336,19 +336,24 @@ function submitQuiz() {
 
     const saveResultScript = document.createElement('script');
     const params = new URLSearchParams({
-        action: "saveResult",
-        name: studentName,
-        email: studentEmail,
-        mobile: studentMobile,
-        score: totalScoreEarned,
-        correct: correctCount,
-        wrong: wrong,
-        attempted: attempted,
-        percentage: actualPercentage.toFixed(2) + "%",
-        discount: "",
-        status: statusText,
-        callback: "handleSaveResponse"
-    });
+    action: "saveResult",
+    name: studentName,
+    email: studentEmail,
+    mobile: studentMobile,
+    score: totalScoreEarned,
+    correct: correctCount,
+    wrong: wrong,
+    attempted: attempted,
+    percentage: actualPercentage.toFixed(2) + "%",
+    discount: "",
+    status: statusText,
+
+    course: document.getElementById("courseSelect").options[
+      document.getElementById("courseSelect").selectedIndex
+    ].text,
+
+    callback: "handleSaveResponse"
+});
 
     saveResultScript.src = `${API_URL}?${params.toString()}`;
     document.body.appendChild(saveResultScript);
@@ -360,7 +365,7 @@ function submitQuiz() {
     document.getElementById("page2").style.display = "none";
     document.getElementById("page3").style.display = "block";
 
-    document.getElementById("result").innerHTML = `
+   document.getElementById("result").innerHTML = `
 <div class="result-card">
 
   <h2 class="result-title">Exam Result</h2>
@@ -380,22 +385,22 @@ function submitQuiz() {
 
   <div class="course-container">
 
-  <div class="course-box">
-    <div class="course-name">Industrial Course</div>
-   <div class="course-price">₹${industrialDiscount}</div>
-  </div>
+    <div class="course-box">
+      <div class="course-name">Industrial Course</div>
+      <div class="course-price">₹${industrialDiscount}</div>
+    </div>
 
-  <div class="course-box">
-    <div class="course-name">Certificate Course</div>
-   <div class="course-price">₹${certificateDiscount}</div>
-  </div>
+    <div class="course-box">
+      <div class="course-name">Certificate Course</div>
+      <div class="course-price">₹${certificateDiscount}</div>
+    </div>
 
-  <div class="course-box">
-    <div class="course-name">Foundation Course</div>
-    <div class="course-price">₹${foundationDiscount}</div>
-  </div>
+    <div class="course-box">
+      <div class="course-name">Foundation Course</div>
+      <div class="course-price">₹${foundationDiscount}</div>
+    </div>
 
-</div>
+  </div>
 
   <div class="status-box">
     <div class="status-title">Result Status</div>
@@ -409,40 +414,42 @@ function submitQuiz() {
   </div>
 
   <div class="certificate-card">
-  <div class="certificate-row">
+    <div class="certificate-row">
 
-    <div class="certificate-left">
+      <div class="certificate-left">
 
-      <img src="logo.png" style="width: 350px; margin-bottom:25px;">
+        <img src="logo.png" style="width: 350px; margin-bottom:25px;">
 
-      <h1 style="text-align:left;">CERTIFICATE OF COMPLETION</h1>
+        <h1 style="text-align:left;">CERTIFICATE OF COMPLETION</h1>
 
-      <p style="text-align:left;">This certificate is awarded to</p>
+        <p style="text-align:left;">This certificate is awarded to</p>
 
-      <h2 class="student-name" style="text-align:left;">${studentName}</h2>
+        <h2 class="student-name" style="text-align:left;">${studentName}</h2>
 
-      <p style="text-align:left;">Who has successfully completed</p>
+        <p style="text-align:left;">Who has successfully completed</p>
 
-      <h3 class="course-name-cert" style="text-align:left;">
-      ${document.getElementById("courseSelect").options[document.getElementById("courseSelect").selectedIndex].text}
-      </h3>
+        <h3 class="course-name-cert" style="text-align:left;">
+        ${document.getElementById("courseSelect").options[document.getElementById("courseSelect").selectedIndex].text}
+        </h3>
 
-      <p style="text-align:left;">
-      Fullfilling All the requirements stipulated by Asterisc to achieve professional excellence.
-      </p>
+        <p style="text-align:left;">
+        Fullfilling All the requirements stipulated by Asterisc to achieve professional excellence.
+        </p>
 
-      <p style="text-align:left;">
-      Issued Date: ${new Date().toLocaleDateString()}
-      </p>
+        <p style="text-align:left;">
+        Issued Date: ${new Date().toLocaleDateString()}
+        </p>
+
+      </div>
+
+      <div class="certificate-right">
+        <img src="seal.png" class="seal-img">
+        <img src="director-panel.png" class="director-img">
+      </div>
 
     </div>
-
-    <div class="certificate-right">
-     <img src="seal.png" class="seal-img">
-      <img src="director-panel.png" class="director-img">
-    </div>
-
   </div>
+
 </div>
 `;
 }
