@@ -12,35 +12,40 @@ let generatedOTP = null;
 
 /* ================= 1. DIRECT EMAIL OTP LOGIC ================= */
 function sendOTP() {
-    let name = document.getElementById("name").value.trim();
     let email = document.getElementById("email").value.trim();
-    let mobile = document.getElementById("mobile").value.trim();
-    let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let name = document.getElementById("name").value.trim();
+    let btn = document.getElementById("sendOtpBtn");
 
-    if (!name || !emailPattern.test(email) || mobile.length !== 10) {
-        alert("Please enter valid Name, Email and 10-digit Mobile Number.");
-        return;
-    }
+    if (!email) { alert("Please enter email"); return; }
 
+    btn.innerText = "Checking...";
+    btn.disabled = true;
+
+    // Check karne ki request
+    const checkScript = document.createElement('script');
+    checkScript.src = `${API_URL}?action=checkEmail&email=${encodeURIComponent(email)}&callback=handleCheck`;
+    document.body.appendChild(checkScript);
+
+    window.handleCheck = function(response) {
+        checkScript.remove();
+        
+        if (response.exists) {
+            // Agar email pehle se hai toh ye alert aayega
+            alert("email Already Submitted! ");
+            btn.innerText = "Send OTP to Email";
+            btn.disabled = false;
+        } else {
+            // Agar email nayi hai toh OTP bhejega
+            sendOTPNow(name, email);
+        }
+    };
+}
+
+function sendOTPNow(name, email) {
     generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
-
     document.getElementById("sendOtpBtn").innerText = "Sending OTP...";
-    document.getElementById("sendOtpBtn").disabled = true;
-    document.getElementById("sendOtpBtn").style.opacity = "0.8";
-
-    const scriptId = "otpScriptTag";
-    const oldScript = document.getElementById(scriptId);
-    if (oldScript) oldScript.remove();
-
     const script = document.createElement('script');
-    script.id = scriptId;
     script.src = `${API_URL}?email=${email}&otp=${generatedOTP}&name=${encodeURIComponent(name)}&callback=handleOtpResponse`;
-
-    window.otpTimeout = setTimeout(() => {
-        alert("❌ OTP Sending Failed! Please check your Google Script Authorization or URL.");
-        resetOTPButton();
-    }, 8000);
-
     document.body.appendChild(script);
 }
 
@@ -347,7 +352,6 @@ function submitQuiz() {
     percentage: actualPercentage.toFixed(2) + "%",
     discount: "",
     status: statusText,
-
     course: document.getElementById("courseSelect").options[
       document.getElementById("courseSelect").selectedIndex
     ].text,
