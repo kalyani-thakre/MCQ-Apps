@@ -1,7 +1,7 @@
 body {
   margin: 0;
   padding: 20px;
-  background: #0a0614;
+  background: #140c2c;
   font-family: Arial, sans-serif;
   color: #f5f3ff;
 }
@@ -24,7 +24,7 @@ body {
 h1 {
   text-align: center;
   margin-bottom: 25px;
-  color: #c084fc;
+  color: #ee0aaa;
   font-size: 34px;
   font-weight: bold;
 }
@@ -94,7 +94,7 @@ h1 {
   width: 100% !important;
   padding: 12px 14px;
   font-size: 16px;
-  background: #9333ea;
+  background: #521986;
   margin: 5px 0 0 0 !important;
   display: block;
   text-align: center;
@@ -185,7 +185,7 @@ button:hover {
 
 /* BUTTON COLORS */
 .review-btn {
-  background: #8b5cf6;
+  background: #5e3ab1;
   flex: 1;
 }
 
@@ -200,7 +200,7 @@ button:hover {
 }
 
 .submit-btn {
-  background: #16a34a;
+  background: #03f35b;
   width: 100% !important;
 }
 
@@ -227,28 +227,29 @@ button:hover {
 }
 
 /* COLOR FIXES */
-.answered { background: #22c55e !important; }
-.current { background: #a855f7 !important; }
-.skipped { background: #f59e0b !important; }
+.answered { background: #05fc5f !important; }
+.current { background: #6820ac !important; }
+.skipped { background: #f89e03 !important; }
 
 /* RESULT */
 #result {
   margin-top: 20px;
   text-align: center;
   font-size: 18px;
-  background: #05010c;
+  background: #160535;
   padding: 30px;
   border-radius: 18px;
   border: 1px solid #3b1b66;
 }
 
-/* ⏱️ TIMER FIXED (WHITE ONLY) */
 #timer {
+  color: #ffffff !important;
   font-size: 32px !important;
   font-weight: bold !important;
-  color: #ffffff !important;
-  text-align: right !important;
-  margin-bottom: 10px !important;
+  #timer {
+  font-size: 32px;
+  color: white;
+}
 }
 
 /* MOBILE FRIENDLY */
@@ -301,7 +302,7 @@ button:hover {
 .course-price{
   font-size:36px;
   font-weight:bold;
-  color:#c084fc;
+  color:#b481e7;
 }
 
 .course-text{
